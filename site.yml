@@ -1,0 +1,9 @@
+---
+# This playbook deploys a basic Splunk installation
+
+- name: Apply common configuration to all nodes
+  hosts: all
+  roles:
+    - base
+
+

@@ -1,0 +1,90 @@
+---
+  
+- name: Tell cloud-init that its job is done (preserves hostname through reboots)
+  file:
+    path: /etc/cloud/cloud-init.disabled
+    state: touch
+  become: yes 
+  
+- name: Add Splunk group
+  group:
+    name: "{{ os_group }}"
+    state: present  
+  become: yes  
+
+- name: Add Splunk user
+  user:
+    name: "{{ os_user }}"
+    comment: Splunk User
+    group: "{{ os_group }}"
+    shell: /bin/bash
+    home: 
+  become: yes
+
+- name: Create $SPLUNK_HOME dir
+  file:
+    path: "{{ splunk_home }}"
+    state: directory
+    mode: 0755  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+- name: Download Splunk TGZ installer
+  get_url:
+    url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=7.2.1&product=splunk&filename={{ splunk_tgz }}&wget=true
+    dest: /home/{{ os_user }}
+    mode: 0640  
+  become: yes
+
+- name: Extract Splunk TGZ to $SPLUNK_HOME
+  unarchive:
+    src: /home/{{ os_user }}/{{ splunk_tgz }}
+    dest: "{{ splunk_home }}/.."
+    remote_src: yes
+  become: yes
+
+- name: Set $SPLUNK_HOME owner & group recursively
+  file:
+    path: "{{ splunk_home }}"
+    state: directory
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    recurse: yes
+  become: yes
+
+# Need to see if I can stream-line next three
+- name: Allow temp world write of $SPLUNK_HOME/etc/system/local/
+  file:
+    path: "{{ splunk_home }}/etc/system/local/"
+    state: directory
+    mode: 0777  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+- name: Create user-seed.conf file for default admin creds
+  template:
+    src: user-seed.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/user-seed.conf"
+
+- name: End temp world write of $SPLUNK_HOME/etc/system/local/
+  file:
+    path: "{{ splunk_home }}/etc/system/local/"
+    state: directory
+    mode: 0755  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    recurse: yes
+  become: yes    
+
+- name: Install splunkd
+  command: "sudo -H -u {{ os_user }} {{ splunk_home }}/bin/splunk start --accept-license"
+  enviornment:
+    SPLUNK_HOME: "{{ splunk_home }}"
+    SPLUNK_ETC: "{{ splunk_home }}/etc"
+  become: yes
+    
+- name: Enable splunkd boot-start
+  command: "{{ splunk_home }}/bin/splunk enable boot-start"
+  become: yes  
