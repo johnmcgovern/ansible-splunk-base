@@ -86,5 +86,5 @@
   become: yes
     
 - name: Enable splunkd boot-start
-  command: "{{ splunk_home }}/bin/splunk enable boot-start"
+  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
   become: yes  
