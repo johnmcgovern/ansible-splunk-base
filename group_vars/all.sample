@@ -4,7 +4,7 @@
 #
 
 # sudo password
-ansible_become_pass: splunker
+ansible_become_pass: hostPasswordSample
 
 # user and group that will run splunkd on the OS and own Splunk files
 os_user: splunk
@@ -17,5 +17,8 @@ splunk_pass: splunker
 # $SPLUNK_HOME path
 splunk_home: /opt/splunk
 
-# Name of Splunk TGZ file
-splunk_tgz: splunk-7.2.1-be11b2c46e23-Linux-x86_64.tgz
+# Splunk version, file name, checksum, and hashing algorith (for wget pull)
+splunk_version: 7.2.4
+splunk_tgz: splunk-7.2.4-8a94541dcfac-Linux-x86_64.tgz
+splunk_tgz_checksum: db26193acd43e33f1cdf04507aa368f1
+splunk_tgz_checksum_alg: md5
