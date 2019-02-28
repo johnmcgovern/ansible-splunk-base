@@ -56,7 +56,7 @@
     recurse: yes
   become: yes  
 
-- name: Install splunk
+- name: Install Splunk to {{ splunk_home }} with user {{ splunk_home }}
   command: "{{ splunk_home }}/bin/splunk start --accept-license"
   environment:
     SPLUNK_HOME: "{{ splunk_home }}"
@@ -70,7 +70,7 @@
 
 - name: "Create symlink to splunk in /usr/local/bin"
   file:
-    src: /opt/splunk/bin/splunk
+    src: "{{ splunk_home }}/bin/splunk"
     path: /usr/local/bin/splunk
     state: link
     owner: "{{ os_user }}"
