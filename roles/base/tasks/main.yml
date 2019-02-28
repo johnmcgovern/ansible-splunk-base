@@ -1,18 +1,12 @@
 ---
   
-- name: Tell cloud-init that its job is done (preserves hostname through reboots)
-  file:
-    path: /etc/cloud/cloud-init.disabled
-    state: touch
-  become: yes 
-  
-- name: Add Splunk group
+- name: Add {{ os_group }} group
   group:
     name: "{{ os_group }}"
     state: present  
   become: yes  
 
-- name: Add Splunk user
+- name: Add {{ os_user }} user
   user:
     name: "{{ os_user }}"
     comment: Splunk User
