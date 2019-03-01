@@ -56,18 +56,14 @@
     recurse: yes
   become: yes  
 
-- name: Install Splunk to {{ splunk_home }} with user {{ splunk_home }}
-  command: "{{ splunk_home }}/bin/splunk start --accept-license"
-  environment:
-    SPLUNK_HOME: "{{ splunk_home }}"
-    SPLUNK_ETC: "{{ splunk_home }}/etc"
-  become: yes
-  become_user: "{{ os_user }}"
-    
 - name: Enable splunkd boot-start
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
+  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
   become: yes  
 
+- name: Start Splunk for the first time using systemctl 
+  command: "systemctl start Splunkd"
+  become: yes
+  
 - name: "Create symlink to splunk in /usr/local/bin"
   file:
     src: "{{ splunk_home }}/bin/splunk"

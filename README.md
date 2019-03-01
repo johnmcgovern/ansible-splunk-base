@@ -70,13 +70,16 @@ This role is tested on:
 
 ### Notes
 
-- The goal of this role is to get to execute a best-practices base Splunk install.
+- The goal of this role is to get to execute a best-practices base Splunk install (including support for Workload Management which is a departure from the standard install).
 
 
 ### ToDo
 
+- Upgrade in place support
 - Support for additional server settings
 - Support for roles such as indexer, standalone search head, search head cluster, cluster master, license master, deployment server, deployer, monitoring console, etc.
+- Automated app install
+- Simplified version/file/hash dictionary
 
 
 ### Contact
