@@ -1,10 +1,8 @@
 
-#
-# Base Splunk Install Variables
-#
+## Base Splunk Install Variables ##
 
 # sudo password
-ansible_become_pass: hostPasswordSample
+ansible_become_pass: samplePassword
 
 # user and group that will run splunkd on the OS and own Splunk files
 os_user: splunk
@@ -18,7 +16,7 @@ splunk_pass: splunker
 splunk_home: /opt/splunk
 
 # Splunk version, file name, checksum, and hashing algorith (for wget pull)
-splunk_version: 7.2.4
-splunk_tgz: splunk-7.2.4-8a94541dcfac-Linux-x86_64.tgz
-splunk_tgz_checksum: db26193acd43e33f1cdf04507aa368f1
+splunk_version: 7.2.4.2
+splunk_tgz: splunk-7.2.4.2-fb30470262e3-Linux-x86_64.tgz
+splunk_tgz_checksum: 85e83bd398a5a2acccf6d519f202a854
 splunk_tgz_checksum_alg: md5
