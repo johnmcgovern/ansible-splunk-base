@@ -5,7 +5,7 @@ This is an Ansible role that installs a bare Splunk instance of a specified vers
 
 ### Setup
 
-1. Install ansible:
+1. Install Ansible
  
 		- sudo apt-get install ansible (Ubuntu) 
 		- brew install ansible (macOS)
@@ -35,30 +35,26 @@ This is an Ansible role that installs a bare Splunk instance of a specified vers
 		- vi group_vars/all
 
 
-### Usage
+### Requirements
 
-1. Ensure that python is installed on the targer server(s)
+1. The Ubuntu target server must already have python installed (Ansible needs it to operate)
 
 		- sudo apt-get install python
+
+
+### Usage
 	
-2. Navigate to playbook base directory
+1. Navigate to playbook base directory
 
 		- cd ./ansible-splunk-role
 	
-3. Run the ansible playbook:
+2. Run the Ansible playbook
 
 		- ansible-playbook -i hosts site.yml
 	
-4. Run the ansible playbook limited to certain hosts:
+3. Run the Ansible playbook limited to certain hosts
 
 		- ansible-playbook -i hosts --limit=host1 site.yml  #limits to a subset of hosts
-
-
-### Requirements
-
-1. The Ubuntu target server must already have python installed (Ansible needs it to operate):
-
-		- sudo apt-get install python
 
 
 ### Compatibility
@@ -75,11 +71,11 @@ This role is tested on:
 
 ### ToDo
 
-- Upgrade in place support
-- Support for additional server settings
+- Upgrade in place support.
+- Support for additional server settings.
 - Support for roles such as indexer, standalone search head, search head cluster, cluster master, license master, deployment server, deployer, monitoring console, etc.
-- Automated app install
-- Simplified version/file/hash dictionary
+- Automated app install.
+- Simplified version/file/hash dictionary.
 
 
 ### Contact
