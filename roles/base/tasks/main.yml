@@ -1,5 +1,5 @@
 ---
-  
+
 - name: Add {{ os_group }} group
   group:
     name: "{{ os_group }}"

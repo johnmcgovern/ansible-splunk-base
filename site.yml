@@ -1,6 +1,12 @@
 ---
 # This playbook deploys a basic Splunk installation
 
+- name: Apply prereqs to all nodes
+  hosts: all
+  gather_facts: no
+  roles:
+    - prereqs
+
 - name: Apply common configuration to all nodes
   hosts: all
   roles:

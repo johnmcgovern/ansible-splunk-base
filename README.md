@@ -35,13 +35,6 @@ This is an Ansible role that installs a bare Splunk instance of a specified vers
 		- vi group_vars/all
 
 
-### Requirements
-
-1. The Ubuntu target server must already have python installed (Ansible needs it to operate)
-
-		- sudo apt-get install python
-
-
 ### Usage
 	
 1. Navigate to playbook base directory
