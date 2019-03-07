@@ -1,8 +1,10 @@
 
 ## Base Splunk Install Variables ##
 
-# sudo password
+# remote host username, enable password, and SSH private key file (if needed)
+ansible_user: ubuntu
 ansible_become_pass: samplePassword
+ansible_ssh_private_key_file: ~/.ssh/my_priv_key
 
 # user and group that will run splunkd on the OS and own Splunk files
 os_user: splunk
