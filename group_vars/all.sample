@@ -17,8 +17,8 @@ splunk_pass: splunker
 # $SPLUNK_HOME path
 splunk_home: /opt/splunk
 
-# Splunk version, file name, checksum, and hashing algorith (for wget pull)
-splunk_version: 7.2.4.2
-splunk_tgz: splunk-7.2.4.2-fb30470262e3-Linux-x86_64.tgz
-splunk_tgz_checksum: 85e83bd398a5a2acccf6d519f202a854
+# Splunk version, filename, checksum, and hashing algorith (for wget pull)
+splunk_version: 7.2.5
+splunk_tgz: splunk-7.2.5-088f49762779-Linux-x86_64.tgz
+splunk_tgz_checksum: 736ffdffa71e1f9afd1eb56fe82acc28
 splunk_tgz_checksum_alg: md5
