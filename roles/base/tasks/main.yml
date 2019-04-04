@@ -56,13 +56,20 @@
     recurse: yes
   become: yes  
 
-- name: Enable splunkd boot-start
+- name: Start Splunk for the first time (initd method)
+  command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: yes  
+  become_user: "{{ os_user }}"
+  when: install_method == "initd"
+
+- name: Splunk enable boot-start
   command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
   become: yes  
 
-- name: Start Splunk for the first time using systemctl 
+- name: Start Splunk for the first time (systemd method)
   command: "systemctl start Splunkd"
   become: yes
+  when: install_method == "systemd"
   
 - name: "Create symlink to splunk in /usr/local/bin"
   file:

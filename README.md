@@ -60,6 +60,7 @@ This role is tested on:
 ### Notes
 
 - The goal of this role is to get to execute a best-practices base Splunk install (including support for Workload Management which is a departure from the standard install).
+- Both "systemd" and "initd" methods of Linux process managemenent are supported. Systemd is available in Splunk Enteprise version 7.2.2 and later.
 
 
 ### ToDo

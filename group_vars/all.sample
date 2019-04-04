@@ -1,12 +1,14 @@
 
-## Base Splunk Install Variables ##
+#===============================
+# Base Splunk Install Variables
+#===============================
 
-# remote host username, enable password, and SSH private key file (if needed)
+# Remote host username, enable password, and SSH private key file (if needed)
 ansible_user: ubuntu
 ansible_become_pass: samplePassword
 ansible_ssh_private_key_file: ~/.ssh/my_priv_key
 
-# user and group that will run splunkd on the OS and own Splunk files
+# User and group that will run splunkd on the OS and own Splunk files
 os_user: splunk
 os_group: splunk
 
@@ -17,8 +19,61 @@ splunk_pass: splunker
 # $SPLUNK_HOME path
 splunk_home: /opt/splunk
 
-# Splunk version, filename, checksum, and hashing algorith (for wget pull)
+# Checksum algorithm (md5 is the default)
+# splunk_tgz_checksum_alg: md5
+
+
+#=========================
+# Splunk Version Selector
+#=========================
+
+# Latest Splunk version, filename, checksum, and hashing algorith (for wget pull)
 splunk_version: 7.2.5.1
 splunk_tgz: splunk-7.2.5.1-962d9a8e1586-Linux-x86_64.tgz
 splunk_tgz_checksum: ed92450d0edb252ae9ecb9cc498732a4
-splunk_tgz_checksum_alg: md5
+
+# Installation method (pick one): 
+# systemd - 7.2.2 or later requried. Support for Workload Management. Recommended.
+# initd - Suppored on any version, but no Workload Management support.
+install_method: systemd
+
+
+
+
+#===========================================================
+# Previous Version Library (uncomment to use) 
+# (also I need to figure out how to optimize this someday)
+#===========================================================
+
+# Systemd supported versions 
+# (Workload Management supported)
+#------------------------------------
+
+# splunk_version: 7.2.5.1
+# splunk_tgz: splunk-7.2.5.1-962d9a8e1586-Linux-x86_64.tgz
+# splunk_tgz_checksum: ed92450d0edb252ae9ecb9cc498732a4
+
+# splunk_version: 7.2.5
+# splunk_tgz: splunk-7.2.5-088f49762779-Linux-x86_64.tgz
+# splunk_tgz_checksum: 736ffdffa71e1f9afd1eb56fe82acc28
+
+# splunk_version: 7.2.4.2
+# splunk_tgz: splunk-7.2.4.2-fb30470262e3-Linux-x86_64.tgz
+# splunk_tgz_checksum: 85e83bd398a5a2acccf6d519f202a854
+
+# splunk_version: 7.2.4
+# splunk_tgz: splunk-7.2.4-8a94541dcfac-Linux-x86_64.tgz 
+# splunk_tgz_checksum: db26193acd43e33f1cdf04507aa368f1
+
+
+# Initd only versions
+# (no Workload Management support)
+#------------------------------------
+
+# splunk_version: 7.1.7
+# splunk_tgz: splunk-7.1.7-39ea4c097c30-Linux-x86_64.tgz
+# splunk_tgz_checksum: ff496bd5ad832258204a2c8edb3e151e
+
+# splunk_version: 7.1.6
+# splunk_tgz: splunk-7.1.6-8f009a3f5353-Linux-x86_64.tgz
+# splunk_tgz_checksum: 5512ec4ed01a3ae9fc4f480b010d8577
