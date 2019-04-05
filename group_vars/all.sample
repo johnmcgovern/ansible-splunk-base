@@ -20,7 +20,7 @@ splunk_pass: splunker
 splunk_home: /opt/splunk
 
 # Checksum algorithm (md5 is the default)
-# splunk_tgz_checksum_alg: md5
+splunk_tgz_checksum_alg: md5
 
 
 #=========================
