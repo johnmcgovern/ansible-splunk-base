@@ -46,8 +46,11 @@ install_method: systemd
 #===========================================================
 
 # Systemd supported versions 
-# (Workload Management supported)
+# (Workload Management supported) 
+# (>= 7.2.2)
 #------------------------------------
+
+# 7.2.x
 
 # splunk_version: 7.2.5.1
 # splunk_tgz: splunk-7.2.5.1-962d9a8e1586-Linux-x86_64.tgz
@@ -68,7 +71,10 @@ install_method: systemd
 
 # Initd only versions
 # (no Workload Management support)
+# (< 7.2.2)
 #------------------------------------
+
+# 7.1.x
 
 # splunk_version: 7.1.7
 # splunk_tgz: splunk-7.1.7-39ea4c097c30-Linux-x86_64.tgz
@@ -77,3 +83,18 @@ install_method: systemd
 # splunk_version: 7.1.6
 # splunk_tgz: splunk-7.1.6-8f009a3f5353-Linux-x86_64.tgz
 # splunk_tgz_checksum: 5512ec4ed01a3ae9fc4f480b010d8577
+
+
+# 7.0.x
+
+# splunk_version: 7.0.9
+# splunk_tgz: splunk-7.0.9-12f0d9382e96-Linux-x86_64.tgz
+# splunk_tgz_checksum: 032c99f736e51a62195f25058fae3415
+
+
+# 6.6.x
+
+# splunk_version: 6.6.12
+# splunk_tgz: splunk-6.6.12-ff1b28d42e4c-Linux-x86_64.tgz
+# splunk_tgz_checksum: 09b209e37901ce67e2bbbd4050c8124c
+
