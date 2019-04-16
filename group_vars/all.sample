@@ -3,24 +3,40 @@
 # Base Splunk Install Variables
 #===============================
 
-# Remote host username, enable password, and SSH private key file (if needed)
-ansible_user: ubuntu
-ansible_become_pass: samplePassword
-ansible_ssh_private_key_file: ~/.ssh/my_priv_key
+#
+# Change These:
+# (Username / password type variables that should be changed)
+#
 
-# User and group that will run splunkd on the OS and own Splunk files
-os_user: splunk
-os_group: splunk
+# Remote host username, password, enable password, and SSH private key file (if needed)
+ansible_user: ubuntu
+ansible_ssh_pass: samplePassword
+ansible_become_pass: samplePassword
+# ansible_ssh_private_key_file: ~/.ssh/my_priv_key
 
 # Username and password for Splunk admin user
 splunk_user: admin
 splunk_pass: splunker
+
+#
+# Reasonable Defaults
+# (The variables are reasonable defaults and can be safely left alone)
+#
+
+# Ansible connection defaults
+ansible_connection: smart
+ansible_port: 22
+
+# User and group that will run splunkd on the OS and own Splunk files
+os_user: splunk
+os_group: splunk
 
 # $SPLUNK_HOME path
 splunk_home: /opt/splunk
 
 # Checksum algorithm (md5 is the default)
 splunk_tgz_checksum_alg: md5
+
 
 
 #=========================
