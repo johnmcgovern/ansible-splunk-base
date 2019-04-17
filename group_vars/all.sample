@@ -44,9 +44,9 @@ splunk_tgz_checksum_alg: md5
 #=========================
 
 # Latest Splunk version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 7.2.5.1
-splunk_tgz: splunk-7.2.5.1-962d9a8e1586-Linux-x86_64.tgz
-splunk_tgz_checksum: ed92450d0edb252ae9ecb9cc498732a4
+splunk_version: 7.2.6
+splunk_tgz: splunk-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
+splunk_tgz_checksum: 736ffdffa71e1f9afd1eb56fe82acc28
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later requried. Support for Workload Management. Recommended.
@@ -67,6 +67,10 @@ install_method: systemd
 #------------------------------------
 
 # 7.2.x
+
+# splunk_version: 7.2.6
+# splunk_tgz: splunk-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
+# splunk_tgz_checksum: 736ffdffa71e1f9afd1eb56fe82acc28
 
 # splunk_version: 7.2.5.1
 # splunk_tgz: splunk-7.2.5.1-962d9a8e1586-Linux-x86_64.tgz

@@ -77,5 +77,4 @@ This role is tested on:
 
 ### Contact
 
-- john@johnmcgovern.com
-or- https://www.johnmcgovern.com
+- john@johnmcgovern.com or https://www.johnmcgovern.com
