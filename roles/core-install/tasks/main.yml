@@ -9,10 +9,10 @@
 - name: Add {{ os_user }} user
   user:
     name: "{{ os_user }}"
-    comment: Splunk User
     group: "{{ os_group }}"
+    home: /home/{{ os_user }}
     shell: /bin/bash
-    home: 
+    comment: Splunk User
   become: yes
 
 - name: Create {{ splunk_home }} dir

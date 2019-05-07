@@ -1,0 +1,41 @@
+---
+
+- name: Download (wget) {{ splunk_tgz }}
+  get_url:
+    url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_version }}&product=splunk&filename={{ splunk_tgz }}&wget=true
+    checksum: "{{ splunk_tgz_checksum_alg }}:{{ splunk_tgz_checksum }}"
+    dest: /home/{{ os_user }}
+    mode: 0640  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+- name: Stop Splunk pre-upgrade (initd method)
+  command: "{{ splunk_home }}/bin/splunk stop --no-prompt --answer-yes --accept-license"
+  become: yes  
+  become_user: "{{ os_user }}"
+  when: install_method == "initd"
+
+- name: Stop Splunk pre-upgrade (systemd method)
+  command: "systemctl stop Splunkd"
+  become: yes
+  when: install_method == "systemd"
+
+- name: Extract {{ splunk_tgz }} over {{ splunk_home }} to upgrade
+  unarchive:
+    src: /home/{{ os_user }}/{{ splunk_tgz }}
+    dest: "{{ splunk_home }}/.."
+    remote_src: yes
+  become: yes
+  become_user: "{{ os_user }}"
+
+- name: Start Splunk for the first time post upgrade (initd method)
+  command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
+  become: yes  
+  become_user: "{{ os_user }}"
+  when: install_method == "initd"
+
+- name: Start Splunk for the first time post upgrade (systemd method)
+  command: "systemctl start Splunkd"
+  become: yes
+  when: install_method == "systemd"

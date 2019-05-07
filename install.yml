@@ -7,9 +7,9 @@
   roles:
     - prereqs
 
-- name: Apply common configuration to all nodes
+- name: Install Splunk
   hosts: all
   roles:
-    - base
+    - core-install
 
 

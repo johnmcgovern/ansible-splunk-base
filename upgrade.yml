@@ -1,0 +1,9 @@
+---
+# This playbook upgrades a basic Splunk installation
+
+- name: Upgrade Splunk
+  hosts: all
+  roles:
+    - core-upgrade
+
+

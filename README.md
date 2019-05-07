@@ -1,6 +1,6 @@
 # Ansible-Splunk-Role
 
-This is an Ansible role that installs a bare Splunk instance of a specified version.
+This is an Ansible role that installs or upgrades Splunk to a specific version.
 
 
 ### Setup
@@ -41,11 +41,15 @@ This is an Ansible role that installs a bare Splunk instance of a specified vers
 
 		- cd ./ansible-splunk-role
 	
-2. Run the Ansible playbook
+2. Run the Splunk install playbook
 
-		- ansible-playbook -i hosts site.yml
+		- ansible-playbook -i hosts install.yml
+
+3. -or- run the Splunk upgrade playbook
+
+		- ansible-playbook -i hosts upgrade.yml
 	
-3. Run the Ansible playbook limited to certain hosts
+4. Run the Ansible playbook limited to certain hosts
 
 		- ansible-playbook -i hosts --limit=host1 site.yml  #limits to a subset of hosts
 
@@ -60,14 +64,15 @@ This role is tested on:
 
 ### Notes
 
-- The goal of this role is to get to execute a best-practices base Splunk install (including support for Workload Management which is a departure from the standard install).
+- The goal of this role is to get to execute a best-practices base Splunk install/upgrade (including support for Workload Management which is a departure from the standard install).
 - Both "systemd" and "initd" methods of Linux process managemenent are supported. Systemd is available in Splunk Enteprise version 7.2.2 and later.
 - This Ansible playbook does not currently handle OS level firewall allowances for splunkd TCP ports.
+- Upgrading an instance from the old initd methord to systemd is currently not supported (hopefully soon in the future).
 
 
 ### ToDo
 
-- Upgrade in place support.
+- Optional OS configs.
 - Optional firewall allowances for splunkd.
 - Support for additional server settings.
 - Support for roles such as indexer, standalone search head, search head cluster, cluster master, license master, deployment server, deployer, monitoring console, etc.
