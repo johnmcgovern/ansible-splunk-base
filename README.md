@@ -49,9 +49,9 @@ This is an Ansible role that installs or upgrades Splunk to a specific version.
 
 		- ansible-playbook -i hosts upgrade.yml
 	
-4. Run the Ansible playbook limited to certain hosts
+4. Run the Ansible playbook limited to certain hosts within the hosts list
 
-		- ansible-playbook -i hosts --limit=host1 site.yml  #limits to a subset of hosts
+		- ansible-playbook -i hosts --limit=host1 install.yml
 
 
 ### Compatibility
