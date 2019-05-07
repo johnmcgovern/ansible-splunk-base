@@ -24,6 +24,13 @@
     group: "{{ os_group }}"
   become: yes
 
+- name: Check for the presence of /home/{{ os_user }}/{{ splunk_tgz }}
+  stat: 
+    path: /home/{{ os_user }}/{{ splunk_tgz }}
+    get_checksum: yes  
+    checksum_algorithm: md5
+  register: splunk_tgz_downloaded_flag
+
 - name: Download (wget) {{ splunk_tgz }}
   get_url:
     url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_version }}&product=splunk&filename={{ splunk_tgz }}&wget=true
@@ -33,6 +40,7 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
+  when: splunk_tgz_downloaded_flag.stat.exists == False
 
 - name: Extract {{ splunk_tgz }} to {{ splunk_home }}
   unarchive:
@@ -56,17 +64,17 @@
     recurse: yes
   become: yes  
 
-- name: Start Splunk for the first time (initd method)
+- name: -initd- Start Splunk for the first time
   command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
   become: yes  
   become_user: "{{ os_user }}"
   when: install_method == "initd"
 
-- name: Splunk enable boot-start
+- name: -systemd & initd- Splunk enable boot-start
   command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
   become: yes  
 
-- name: Start Splunk for the first time (systemd method)
+- name: -systemd- Start Splunk for the first time
   command: "systemctl start Splunkd"
   become: yes
   when: install_method == "systemd"

@@ -1,5 +1,12 @@
 ---
 
+- name: Check for the presence of /home/{{ os_user }}/{{ splunk_tgz }}
+  stat: 
+    path: /home/{{ os_user }}/{{ splunk_tgz }}
+    get_checksum: yes  
+    checksum_algorithm: md5
+  register: splunk_tgz_downloaded_flag
+
 - name: Download (wget) {{ splunk_tgz }}
   get_url:
     url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_version }}&product=splunk&filename={{ splunk_tgz }}&wget=true
@@ -9,16 +16,23 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
+  when: splunk_tgz_downloaded_flag.stat.exists == False
 
-- name: Stop Splunk pre-upgrade (initd method)
-  command: "{{ splunk_home }}/bin/splunk stop --no-prompt --answer-yes --accept-license"
+- name: -initd- Stop Splunk pre-upgrade
+  command: "{{ splunk_home }}/bin/splunk stop"
   become: yes  
   become_user: "{{ os_user }}"
   when: install_method == "initd"
 
-- name: Stop Splunk pre-upgrade (systemd method)
-  command: "systemctl stop Splunkd"
+- name: -systemd- Stop Splunk pre-upgrade
+  command: bash -c "test -e /etc/systemd/system/Splunk.service || (systemctl stop Splunkd)"
   become: yes
+  when: install_method == "systemd"  
+
+- name: -systemd- If we are running initd but moving to systemd then stop via initd - TODO better test for systemd precense 
+  command: bash -c "test -e /etc/systemd/system/Splunk.service || ({{ splunk_home }}/bin/splunk stop)"
+  become: yes
+  become_user: "{{ os_user }}"
   when: install_method == "systemd"
 
 - name: Extract {{ splunk_tgz }} over {{ splunk_home }} to upgrade
@@ -29,13 +43,23 @@
   become: yes
   become_user: "{{ os_user }}"
 
-- name: Start Splunk for the first time post upgrade (initd method)
+- name: -initd- Start Splunk for the first time post upgrade
   command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
   become: yes  
   become_user: "{{ os_user }}"
   when: install_method == "initd"
 
-- name: Start Splunk for the first time post upgrade (systemd method)
+- name: -systemd- For initd to systemd upgrades remove initd script
+  command: "{{ splunk_home }}/bin/splunk disable boot-start --no-prompt --answer-yes --accept-license"
+  become: yes
+  when: install_method == "systemd"
+
+- name: -systemd- For initd to systemd upgrade rebuild systemd script
+  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
+  become: yes
+  when: install_method == "systemd"  
+
+- name: -systemd- Start Splunk for the first time post upgrade
   command: "systemctl start Splunkd"
   become: yes
   when: install_method == "systemd"
