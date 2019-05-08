@@ -18,22 +18,28 @@
   become: yes
   when: splunk_tgz_downloaded_flag.stat.exists == False
 
+- name: -initd- Check if Splunk has ever been run via initd
+  stat: 
+    path: /etc/init.d/splunk
+  register: initd_run_flag
+
+- name: -systemd- Check if Splunk has ever been run via systemd
+  stat: 
+    path: /etc/systemd/system/Splunkd.service
+  register: systemd_run_flag
+
 - name: -initd- Stop Splunk pre-upgrade
   command: "{{ splunk_home }}/bin/splunk stop"
   become: yes  
   become_user: "{{ os_user }}"
-  when: install_method == "initd"
+  when: initd_run_flag.stat.exists == True
 
 - name: -systemd- Stop Splunk pre-upgrade
-  command: bash -c "test -e /etc/systemd/system/Splunk.service || (systemctl stop Splunkd)"
+  systemd:
+    name: Splunkd
+    state: stopped
   become: yes
-  when: install_method == "systemd"  
-
-- name: -systemd- If we are running initd but moving to systemd then stop via initd - TODO better test for systemd precense 
-  command: bash -c "test -e /etc/systemd/system/Splunk.service || ({{ splunk_home }}/bin/splunk stop)"
-  become: yes
-  become_user: "{{ os_user }}"
-  when: install_method == "systemd"
+  when: systemd_run_flag.stat.exists == True
 
 - name: Extract {{ splunk_tgz }} over {{ splunk_home }} to upgrade
   unarchive:
@@ -49,12 +55,12 @@
   become_user: "{{ os_user }}"
   when: install_method == "initd"
 
-- name: -systemd- For initd to systemd upgrades remove initd script
+- name: -systemd- For initd -> systemd upgrades remove initd script
   command: "{{ splunk_home }}/bin/splunk disable boot-start --no-prompt --answer-yes --accept-license"
   become: yes
   when: install_method == "systemd"
 
-- name: -systemd- For initd to systemd upgrade rebuild systemd script
+- name: -systemd- For initd -> systemd upgrade rebuild systemd script
   command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
   become: yes
   when: install_method == "systemd"  

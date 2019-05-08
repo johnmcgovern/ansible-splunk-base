@@ -109,4 +109,4 @@ venv.bak/
 # Project specific
 group_vars/all
 hosts
-.retry
+*.retry
