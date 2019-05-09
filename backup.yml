@@ -1,0 +1,7 @@
+---
+# This playbook backs up Splunk configuration in $SPLUNK_HOME/etc/ to $HOME_PATH/backups/
+
+- name: Backup Splunk configuration
+  hosts: all
+  roles:
+    - core-backup-config

@@ -48,6 +48,10 @@ This is an Ansible role that installs or upgrades Splunk to a specific version.
 3. -or- run the Splunk upgrade playbook
 
 		- ansible-playbook -i hosts upgrade.yml
+
+4. -or- run the Splunk configuration backup playbook
+
+		- ansible-playbook -i host backup.yml
 	
 4. Run the Ansible playbook limited to certain hosts within the hosts list
 
