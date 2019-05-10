@@ -19,7 +19,7 @@
     group: "{{ os_group }}"
   become: yes
 
-- name: Name backup file
+- name: Name backup file with timestamp
   command: mv /home/{{ os_user }}/config-backups/splunk-config-temp.tgz /home/{{ os_user }}/config-backups/splunk-config-{{ lookup('pipe', 'date +"%Y-%m-%d--%H-%M-%S"') }}.tgz
   become: yes
   become_user: "{{ os_user }}"
