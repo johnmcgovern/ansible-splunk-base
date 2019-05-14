@@ -52,8 +52,12 @@ This is an Ansible role that installs or upgrades Splunk to a specific version.
 4. -or- run the Splunk configuration backup playbook
 
 		- ansible-playbook -i host backup.yml
-	
-4. Run the Ansible playbook limited to certain hosts within the hosts list
+
+5. -or- run the Splunk OS initial configuration playbook
+
+		- ansible-playbook -i host os-config.yml
+
+6. Run the Ansible playbook limited to certain hosts within the hosts list
 
 		- ansible-playbook -i hosts --limit=host1 install.yml
 
@@ -75,7 +79,6 @@ This role is tested on:
 
 ### To-Do
 
-- Optional OS configs.
 - Optional firewall allowances for splunkd.
 - Support for additional server settings.
 - Support for roles such as indexer, standalone search head, search head cluster, cluster master, license master, deployment server, deployer, monitoring console, etc.

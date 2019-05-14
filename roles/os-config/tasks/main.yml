@@ -1,0 +1,85 @@
+---
+
+- name: Tell cloud-init that its job is done (preserves hostname through reboots)
+  file:
+    path: /etc/cloud/cloud-init.disabled
+    state: touch
+  become: yes 
+
+- name: Set the hostname as per the Ansible inventory file
+  hostname:
+    name: "{{ inventory_hostname }}"
+  become: yes    
+
+
+- name: Add {{ os_group }} group so we can set ulimits for the user
+  group:
+    name: "{{ os_group }}"
+    state: present  
+  become: yes  
+
+- name: Add {{ os_user }} user so we can set ulimits for it
+  user:
+    name: "{{ os_user }}"
+    group: "{{ os_group }}"
+    home: /home/{{ os_user }}
+    shell: /bin/bash
+    comment: Splunk User
+  become: yes
+
+- name: Create {{ splunk_home }} dir so we can set ulimits for the user
+  file:
+    path: "{{ splunk_home }}"
+    state: directory
+    mode: 0755  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+
+- name: -ulimits- Set open files ulimit to 64000
+  command: bash -c "ulimit -n 64000"
+  become: yes
+  become_user: "{{ os_user }}"
+
+- name: -ulimits- Set user processes ulimit to 16000
+  command: bash -c "ulimit -u 16000"
+  become: yes  
+  become_user: "{{ os_user }}"
+
+- name: -ulimits- Set data segment size ulimit to 1073741824
+  command: bash -c "ulimit -d 1073741824"
+  become: yes     
+  become_user: "{{ os_user }}"
+
+
+- name: -THP- Disable Transparent Huge Pages (THP) Redhat part 1
+  command: "echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled"
+  become: yes 
+
+- name: -THP- Disable Transparent Huge Pages (THP) Redhat part 2
+  command: "echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag"
+  become: yes   
+
+- name: -THP- Disable Transparent Huge Pages (THP) - Linux Part 1
+  command: "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+  become: yes   
+
+- name: -THP- Disable Transparent Huge Pages (THP) - Linux Part 2
+  command: "echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+  become: yes   
+
+
+- name: -Ubuntu Updates- Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+  become: yes     
+  when: ansible_distribution == "Ubuntu"      
+
+- name: -Ubuntu Updates- Update all packages to the latest version
+  apt:
+    upgrade: yes    
+    autoremove: yes    
+  become: yes     
+  when: ansible_distribution == "Ubuntu"    
+

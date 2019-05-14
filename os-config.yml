@@ -1,0 +1,13 @@
+---
+# This playbook performs basic OS level config
+
+- name: Apply prereqs to all nodes
+  hosts: all
+  gather_facts: no
+  roles:
+    - prereqs
+
+- name: OS Baseline Configuration
+  hosts: all
+  roles:
+    - os-config
