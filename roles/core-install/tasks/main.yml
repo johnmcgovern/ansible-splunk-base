@@ -30,6 +30,7 @@
     get_checksum: yes  
     checksum_algorithm: md5
   register: splunk_tgz_downloaded_flag
+  become: yes
 
 - name: Download (wget) {{ splunk_tgz }}
   get_url:
