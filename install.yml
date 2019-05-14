@@ -1,5 +1,5 @@
 ---
-# This playbook deploys a basic Splunk installation
+# This playbook deploys a basic Splunk Enterprise (Core) installation
 
 - name: Apply prereqs to all nodes
   hosts: all

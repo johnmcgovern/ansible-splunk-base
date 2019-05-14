@@ -14,9 +14,14 @@ ansible_ssh_pass: samplePassword
 ansible_become_pass: samplePassword
 # ansible_ssh_private_key_file: ~/.ssh/my_priv_key
 
-# Username and password for Splunk admin user
+# Username and password for Splunk Enterprise admin user
 splunk_user: admin
 splunk_pass: splunker
+
+# Username and password for Splunk Universal Forwarder admin user
+splunk_uf_user: ufadmin
+splunk_uf_pass: splunker
+
 
 #
 # Reasonable Defaults
@@ -33,17 +38,19 @@ os_group: splunk
 
 # $SPLUNK_HOME path
 splunk_home: /opt/splunk
+splunk_uf_home: /opt/splunkforwarder
 
 # Checksum algorithm (md5 is the default)
 splunk_tgz_checksum_alg: md5
+splunk_uf_tgz_checksum_alg: md5
 
 
 
-#=========================
-# Splunk Version Selector
-#=========================
+#===========================================
+# Splunk Enterprise (Core) Version Selector
+#===========================================
 
-# Latest Splunk version, filename, checksum, and hashing algorith (for wget pull)
+# Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
 splunk_version: 7.2.6
 splunk_tgz: splunk-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
 splunk_tgz_checksum: 4a182b7189e8b1be70e4ba8516ca0548
@@ -55,11 +62,20 @@ install_method: systemd
 
 
 
+#=============================================
+# Splunk Universal Forwarder Version Selector
+#=============================================
 
-#===========================================================
-# Previous Version Library (uncomment to use) 
-# (also I need to figure out how to optimize this someday)
-#===========================================================
+# Latest Splunk Universal Forwarder version, filename, checksum, and hashing algorith (for wget pull)
+splunk_uf_version: 7.2.6
+splunk_uf_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
+
+
+
+#===============================================================
+# Splunk Enterprise Version Library (uncomment and copy to use) 
+#===============================================================
 
 # Systemd supported versions 
 # (Workload Management supported) 
@@ -117,4 +133,16 @@ install_method: systemd
 # splunk_version: 6.6.12
 # splunk_tgz: splunk-6.6.12-ff1b28d42e4c-Linux-x86_64.tgz
 # splunk_tgz_checksum: 09b209e37901ce67e2bbbd4050c8124c
+
+
+
+#========================================================================
+# Splunk Universal Forwarder Version Library (uncomment and copy to use) 
+#========================================================================
+
+# 7.2.6
+
+# splunk_uf_version: 7.2.6
+# splunk_uf_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
 

@@ -1,5 +1,5 @@
 ---
-# This playbook upgrades a basic Splunk installation
+# This playbook upgrades a basic Splunk Enteprise (Core) installation
 
 - name: Upgrade Splunk
   hosts: all

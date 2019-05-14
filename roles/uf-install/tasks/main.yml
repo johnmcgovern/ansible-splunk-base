@@ -1,0 +1,90 @@
+---
+
+- name: Add {{ os_group }} group
+  group:
+    name: "{{ os_group }}"
+    state: present  
+  become: yes  
+
+- name: Add {{ os_user }} user
+  user:
+    name: "{{ os_user }}"
+    group: "{{ os_group }}"
+    home: /home/{{ os_user }}
+    shell: /bin/bash
+    comment: Splunk User
+  become: yes
+
+- name: Create {{ splunk_uf_home }} dir
+  file:
+    path: "{{ splunk_uf_home }}"
+    state: directory
+    mode: 0755  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+- name: Check for the presence of /home/{{ os_user }}/{{ splunk_uf_tgz }}
+  stat: 
+    path: /home/{{ os_user }}/{{ splunk_uf_tgz }}
+    get_checksum: yes  
+    checksum_algorithm: "{{ splunk_uf_tgz_checksum_alg }}"
+  register: splunk_uf_tgz_downloaded_flag
+  become: yes
+
+- name: Download (wget) {{ splunk_uf_tgz }}
+  get_url:
+    url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_uf_version }}&product=universalforwarder&filename={{ splunk_uf_tgz }}&wget=true
+    checksum: "{{ splunk_uf_tgz_checksum_alg }}:{{ splunk_uf_tgz_checksum }}"
+    dest: /home/{{ os_user }}
+    mode: 0640  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+  when: splunk_uf_tgz_downloaded_flag.stat.exists == False
+
+- name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }}
+  unarchive:
+    src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
+    dest: "{{ splunk_uf_home }}/.."
+    remote_src: yes
+  become: yes
+
+- name: Create user-seed.conf file for default admin creds
+  template:
+    src: user-seed.conf.j2
+    dest: "{{ splunk_uf_home }}/etc/system/local/user-seed.conf"
+  become: yes
+
+- name: Set {{ splunk_uf_home }} owner & group recursively
+  file:
+    path: "{{ splunk_uf_home }}"
+    state: directory
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    recurse: yes
+  become: yes  
+
+- name: -initd- Start Splunk UF for the first time
+  command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: yes  
+  become_user: "{{ os_user }}"
+  when: install_method == "initd"
+
+- name: -systemd & initd- Splunk enable boot-start
+  command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+  become: yes  
+
+- name: -systemd- Start Splunk for the first time
+  command: "systemctl start SplunkForwarder"
+  become: yes
+  when: install_method == "systemd"
+  
+- name: "Create symlink to splunk in /usr/local/bin"
+  file:
+    src: "{{ splunk_uf_home }}/bin/splunk"
+    path: /usr/local/bin/splunk
+    state: link
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
