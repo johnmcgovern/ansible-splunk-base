@@ -73,7 +73,8 @@ This role is tested on:
 ### Notes
 
 - The goal of this role is to get to execute a best-practices base Splunk install/upgrade (including support for Workload Management which is a departure from the previous install method).
-- Both "systemd" and "initd" methods of Linux process managemenent are supported. Systemd is ONLY available in Splunk Enteprise version 7.2.2 and later.
+- Both "systemd" and "initd" methods of Linux process managemenent are supported. systemd is ONLY available in Splunk Enteprise version 7.2.2 and later. 
+- Splunk versions 7.2.2 - 7.2.x implement "enable boot-start" differently than 7.3.0 and later. This is now accounted for.
 - Assuming a semi-default install (such as you would find if you installed with this playbook), upgrade.yml will convert from initd process management to systemd process management if you flag "systemd" on install_method.
 - This Ansible playbook does not currently handle OS level firewall allowances for splunkd TCP ports.
 

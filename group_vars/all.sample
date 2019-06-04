@@ -56,8 +56,7 @@ splunk_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
 splunk_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
 
 # Installation method (pick one): 
-# systemd - 7.3.0 or later required. Support for "2nd gen" "explicit" systemd install method (recommended).
-# systemd-implicit - 7.2.2 through 7.2.7 only. Support for "1st gen" systemd installation.
+# systemd - 7.2.2 or later required.
 # initd - Suppored on any version, but no Workload Management support.
 install_method: systemd
 
