@@ -56,6 +56,15 @@
     dest: "{{ splunk_home }}/etc/system/local/user-seed.conf"
   become: yes
 
+- name: "Touch {{ splunk_home }}/etc/.ui_login"
+  file:
+    path: "{{ splunk_home }}/etc/.ui_login"
+    state: touch
+    mode: '0644'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes  
+
 - name: Set {{ splunk_home }} owner & group recursively
   file:
     path: "{{ splunk_home }}"
