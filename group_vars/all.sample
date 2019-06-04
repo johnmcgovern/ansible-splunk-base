@@ -12,7 +12,7 @@
 ansible_user: ubuntu
 ansible_ssh_pass: samplePassword
 ansible_become_pass: samplePassword
-# ansible_ssh_private_key_file: ~/.ssh/my_priv_key
+# ansible_ssh_private_key_file: ~/.ssh/id_rsa
 
 # Username and password for Splunk Enterprise admin user
 splunk_user: admin
@@ -51,12 +51,13 @@ splunk_uf_tgz_checksum_alg: md5
 #===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 7.2.6
-splunk_tgz: splunk-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
-splunk_tgz_checksum: 4a182b7189e8b1be70e4ba8516ca0548
+splunk_version: 7.3.0
+splunk_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
+splunk_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
 
 # Installation method (pick one): 
-# systemd - 7.2.2 or later requried. Support for Workload Management. Recommended.
+# systemd - 7.3.0 or later required. Support for "2nd gen" "explicit" systemd install method (recommended).
+# systemd-implicit - 7.2.2 through 7.2.7 only. Support for "1st gen" systemd installation.
 # initd - Suppored on any version, but no Workload Management support.
 install_method: systemd
 
@@ -67,9 +68,9 @@ install_method: systemd
 #=============================================
 
 # Latest Splunk Universal Forwarder version, filename, checksum, and hashing algorith (for wget pull)
-splunk_uf_version: 7.2.6
-splunk_uf_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
-splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
+splunk_uf_version: 7.3.0
+splunk_uf_tgz: splunkforwarder-7.3.0-657388c7a488-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
 
 
 
@@ -81,6 +82,12 @@ splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
 # (Workload Management supported) 
 # (>= 7.2.2)
 #------------------------------------
+
+# 7.3.x
+
+# splunk_version: 7.3.0
+# splunk_tgz: splunk-7.3.0-657388c7a488-Linux-x86_64.tgz
+# splunk_tgz_checksum: 682185ee7e193325762b42118a218736
 
 # 7.2.x
 
@@ -120,13 +127,15 @@ splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
 # splunk_tgz: splunk-7.1.6-8f009a3f5353-Linux-x86_64.tgz
 # splunk_tgz_checksum: 5512ec4ed01a3ae9fc4f480b010d8577
 
-
 # 7.0.x
+
+# splunk_version: 7.0.10
+# splunk_tgz: splunk-7.0.10-d8401e2713e7-Linux-x86_64.tgz
+# splunk_tgz_checksum: 6d3be843e9f8623b3321757299ed010a
 
 # splunk_version: 7.0.9
 # splunk_tgz: splunk-7.0.9-12f0d9382e96-Linux-x86_64.tgz
 # splunk_tgz_checksum: 032c99f736e51a62195f25058fae3415
-
 
 # 6.6.x
 
@@ -139,6 +148,12 @@ splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
 #========================================================================
 # Splunk Universal Forwarder Version Library (uncomment and copy to use) 
 #========================================================================
+
+# 7.3.0
+
+# splunk_uf_version: 7.3.0
+# splunk_uf_tgz: splunkforwarder-7.3.0-657388c7a488-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
 
 # 7.2.6
 
