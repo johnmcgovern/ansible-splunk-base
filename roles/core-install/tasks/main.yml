@@ -63,7 +63,19 @@
     mode: '0644'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes  
+  become: yes   
+
+- name: Create user-prefs.conf file for default user/UI preferences
+  template:
+    src: user-prefs.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/user-prefs.conf"
+  become: yes
+
+- name: Create ui-tour.conf to disable default search tour
+  template:
+    src: ui-tour.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/ui-tour.conf"
+  become: yes
 
 - name: Set {{ splunk_home }} owner & group recursively
   file:
