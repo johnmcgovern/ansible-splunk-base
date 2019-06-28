@@ -37,20 +37,11 @@
   become: yes
 
 
-- name: -ulimits- Set open files ulimit to 64000
-  command: bash -c "ulimit -n 64000"
+- name: Set /etc/security/limits.conf for {{ os_user }} user
+  template:
+    src: limits.conf.j2
+    dest: "/etc/security/limits.conf"
   become: yes
-  become_user: "{{ os_user }}"
-
-- name: -ulimits- Set user processes ulimit to 16000
-  command: bash -c "ulimit -u 16000"
-  become: yes  
-  become_user: "{{ os_user }}"
-
-- name: -ulimits- Set data segment size ulimit to 1073741824
-  command: bash -c "ulimit -d 1073741824"
-  become: yes     
-  become_user: "{{ os_user }}"
 
 
 - name: -THP- Disable Transparent Huge Pages (THP) Redhat part 1
@@ -83,3 +74,10 @@
   become: yes     
   when: ansible_distribution == "Ubuntu"    
 
+
+- name: -RedHat & CentOS Updates-
+  yum:
+    name: "*"
+    state: latest  
+  become: yes
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
