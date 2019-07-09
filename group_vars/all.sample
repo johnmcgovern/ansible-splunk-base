@@ -90,6 +90,10 @@ splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
 
 # 7.2.x
 
+# splunk_version: 7.2.7
+# splunk_tgz: splunk-7.2.7-f817a93effc2-Linux-x86_64.tgz
+# splunk_tgz_checksum: d3e59efdb12f7c98408c681d39b7ac04
+
 # splunk_version: 7.2.6
 # splunk_tgz: splunk-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
 # splunk_tgz_checksum: 4a182b7189e8b1be70e4ba8516ca0548
