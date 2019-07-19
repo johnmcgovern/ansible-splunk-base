@@ -52,8 +52,8 @@ splunk_uf_tgz_checksum_alg: md5
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
 splunk_version: 7.3.0
-splunk_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
-splunk_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
+splunk_tgz: splunk-7.3.0-657388c7a488-Linux-x86_64.tgz
+splunk_tgz_checksum: 682185ee7e193325762b42118a218736
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.

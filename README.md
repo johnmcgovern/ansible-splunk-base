@@ -51,11 +51,11 @@ This is an Ansible role that installs or upgrades Splunk to a specific version.
 
 4. -or- run the Splunk configuration backup playbook
 
-		- ansible-playbook -i host backup.yml
+		- ansible-playbook -i hosts backup.yml
 
 5. -or- run the Splunk OS initial configuration playbook
 
-		- ansible-playbook -i host os-config.yml
+		- ansible-playbook -i hosts os-config.yml
 
 6. Run the Ansible playbook limited to certain hosts within the hosts list
 
