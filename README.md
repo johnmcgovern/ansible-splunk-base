@@ -1,6 +1,6 @@
-# Ansible-Splunk-Role
+# Ansible-Splunk-Base
 
-This is an Ansible role that installs or upgrades Splunk to a specific version.
+This is an Ansible project that installs or upgrades Splunk to a specific version. It can also perform basic OS config (ulimits, THP disabled, hostname, etc.) and ./splunk/etc/ backups.
 
 
 ### Setup
