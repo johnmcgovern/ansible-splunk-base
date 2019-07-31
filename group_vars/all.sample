@@ -51,9 +51,9 @@ splunk_uf_tgz_checksum_alg: md5
 #===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 7.3.0
-splunk_tgz: splunk-7.3.0-657388c7a488-Linux-x86_64.tgz
-splunk_tgz_checksum: 682185ee7e193325762b42118a218736
+splunk_version: 7.3.1
+splunk_tgz: splunk-7.3.1-bd63e13aa157-Linux-x86_64.tgz
+splunk_tgz_checksum: 1b6080805db370fc798f52ef068f2d84
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.
@@ -62,14 +62,14 @@ install_method: systemd
 
 
 
-#=============================================
-# Splunk Universal Forwarder Version Selector
-#=============================================
+#==================================================
+# Splunk Universal Forwarder (UF) Version Selector
+#==================================================
 
-# Latest Splunk Universal Forwarder version, filename, checksum, and hashing algorith (for wget pull)
-splunk_uf_version: 7.3.0
-splunk_uf_tgz: splunkforwarder-7.3.0-657388c7a488-Linux-x86_64.tgz
-splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
+# Latest Splunk Universal Forwarder (UF) version, filename, checksum, and hashing algorith (for wget pull)
+splunk_uf_version: 7.3.1
+splunk_uf_tgz: splunkforwarder-7.3.1-bd63e13aa157-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: eb975c1465232af3f085907fe352b560
 
 
 
@@ -83,6 +83,10 @@ splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
 #------------------------------------
 
 # 7.3.x
+
+# splunk_version: 7.3.1
+# splunk_tgz: splunk-7.3.1-bd63e13aa157-Linux-x86_64.tgz
+# splunk_tgz_checksum: 1b6080805db370fc798f52ef068f2d84
 
 # splunk_version: 7.3.0
 # splunk_tgz: splunk-7.3.0-657388c7a488-Linux-x86_64.tgz
@@ -152,15 +156,14 @@ splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
 # Splunk Universal Forwarder Version Library (uncomment and copy to use) 
 #========================================================================
 
-# 7.3.0
+# 7.3.x
 
-# splunk_uf_version: 7.3.0
-# splunk_uf_tgz: splunkforwarder-7.3.0-657388c7a488-Linux-x86_64.tgz
-# splunk_uf_tgz_checksum: cfbad34ea43388bb42d83ed3a0f43783
+# splunk_uf_version: 7.3.1
+# splunk_uf_tgz: splunkforwarder-7.3.1-bd63e13aa157-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: eb975c1465232af3f085907fe352b560
 
-# 7.2.6
+# 7.2.x
 
 # splunk_uf_version: 7.2.6
 # splunk_uf_tgz: splunkforwarder-7.2.6-c0bf0f679ce9-Linux-x86_64.tgz
 # splunk_uf_tgz_checksum: c8a17478cf4dfe79c702744a529ec9ea
-

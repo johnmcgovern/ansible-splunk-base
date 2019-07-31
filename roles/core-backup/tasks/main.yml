@@ -1,6 +1,6 @@
 ---
 
-- name: Create /home{{ os_user }}/config-backups dir
+- name: Create /home/{{ os_user }}/config-backups dir
   file:
     path: /home/{{ os_user }}/config-backups
     state: directory
