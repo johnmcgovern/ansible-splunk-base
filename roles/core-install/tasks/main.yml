@@ -1,16 +1,16 @@
 ---
 
-- name: Add {{ os_group }} group
+- name: Add "{{ os_group }}" group
   group:
     name: "{{ os_group }}"
     state: present  
   become: yes  
 
-- name: Add {{ os_user }} user
+- name: Add "{{ os_user }}" user with the home dir /home/{{ os_user }}/
   user:
     name: "{{ os_user }}"
     group: "{{ os_group }}"
-    home: /home/{{ os_user }}
+    home: /home/{{ os_user }}/
     shell: /bin/bash
     comment: Splunk User
   become: yes

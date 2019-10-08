@@ -12,32 +12,23 @@
   become: yes    
 
 
-- name: Add {{ os_group }} group so we can set ulimits for the user
+- name: Add "{{ os_group }}" group (so we can set ulimits)
   group:
     name: "{{ os_group }}"
     state: present  
   become: yes  
 
-- name: Add {{ os_user }} user so we can set ulimits for it
+- name: Add "{{ os_user }}" user with the home dir /home/{{ os_user }}/ (so we can set ulimits)
   user:
     name: "{{ os_user }}"
     group: "{{ os_group }}"
-    home: /home/{{ os_user }}
+    home: /home/{{ os_user }}/
     shell: /bin/bash
     comment: Splunk User
   become: yes
 
-- name: Create {{ splunk_home }} dir so we can set ulimits for the user
-  file:
-    path: "{{ splunk_home }}"
-    state: directory
-    mode: 0755  
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
 
-
-- name: Set /etc/security/limits.conf for {{ os_user }} user
+- name: Set /etc/security/limits.conf for "{{ os_user }}" user
   template:
     src: limits.conf.j2
     dest: "/etc/security/limits.conf"
