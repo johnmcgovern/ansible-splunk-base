@@ -8,17 +8,21 @@
 # (Username / password type variables that should be changed)
 #
 
-# Remote host username, password, enable password, and SSH private key file (if needed)
+# Remote host username, password, enable password, and SSH private key file (default method)
+#   If one of ssh_pass, become_pass (sudo), and private_key are not needed, 
+#   comment them out based on your authentication method.
 ansible_user: ubuntu
-ansible_ssh_pass: samplePassword
-ansible_become_pass: samplePassword
-# ansible_ssh_private_key_file: ~/.ssh/id_rsa
+# ansible_ssh_pass: samplePassword
+# ansible_become_pass: samplePassword
+ansible_ssh_private_key_file: ~/.ssh/id_rsa
 
 # Username and password for Splunk Enterprise admin user
+#   (only used during initial install)
 splunk_user: admin
 splunk_pass: splunker
 
 # Username and password for Splunk Universal Forwarder admin user
+#   (only used during initial install)
 splunk_uf_user: ufadmin
 splunk_uf_pass: splunker
 
@@ -72,6 +76,7 @@ splunk_uf_tgz_checksum: 874c1bf7670b8d2efcacb269adfb7cd7
 
 
 
+
 #===============================================================
 # Splunk Enterprise Version Library (uncomment and copy to use) 
 #===============================================================
@@ -100,6 +105,10 @@ splunk_uf_tgz_checksum: 874c1bf7670b8d2efcacb269adfb7cd7
 # splunk_tgz_checksum: 682185ee7e193325762b42118a218736
 
 # 7.2.x
+
+# splunk_version: 7.2.8
+# splunk_tgz: splunk-7.2.8-d613a50d43ac-Linux-x86_64.tgz
+# splunk_tgz_checksum: 3165aaf0c088759b2dbaa5b0d0a7af76
 
 # splunk_version: 7.2.7
 # splunk_tgz: splunk-7.2.7-f817a93effc2-Linux-x86_64.tgz
@@ -133,6 +142,14 @@ splunk_uf_tgz_checksum: 874c1bf7670b8d2efcacb269adfb7cd7
 
 # 7.1.x
 
+# splunk_version: 7.1.9
+# splunk_tgz: splunk-7.1.9-45b25e1f9be3-Linux-x86_64.tgz
+# splunk_tgz_checksum: 1665c1dc6a7fe73402803d9f118305fa
+
+# splunk_version: 7.1.8
+# splunk_tgz: splunk-7.1.8-3856f9bb4747-Linux-x86_64.tgz
+# splunk_tgz_checksum: 777aa559584079cb4d6192ba7b2c93d8
+
 # splunk_version: 7.1.7
 # splunk_tgz: splunk-7.1.7-39ea4c097c30-Linux-x86_64.tgz
 # splunk_tgz_checksum: ff496bd5ad832258204a2c8edb3e151e
@@ -156,6 +173,7 @@ splunk_uf_tgz_checksum: 874c1bf7670b8d2efcacb269adfb7cd7
 # splunk_version: 6.6.12
 # splunk_tgz: splunk-6.6.12-ff1b28d42e4c-Linux-x86_64.tgz
 # splunk_tgz_checksum: 09b209e37901ce67e2bbbd4050c8124c
+
 
 
 
