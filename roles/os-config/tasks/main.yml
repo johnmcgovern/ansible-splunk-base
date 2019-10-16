@@ -60,7 +60,7 @@
 
 - name: -Ubuntu Updates- Update all packages to the latest version
   apt:
-    upgrade: yes    
+    upgrade: yes
     autoremove: yes    
   become: yes     
   when: ansible_distribution == "Ubuntu"    
