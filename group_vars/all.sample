@@ -55,9 +55,9 @@ splunk_uf_tgz_checksum_alg: md5
 #===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 7.3.2
-splunk_tgz: splunk-7.3.2-c60db69f8e32-Linux-x86_64.tgz
-splunk_tgz_checksum: 7b0008d37e815862c72c614fc53719e5
+splunk_version: 8.0.0
+splunk_tgz: splunk-8.0.0-1357bef0a7f6-Linux-x86_64.tgz
+splunk_tgz_checksum: e4dd7986af1740504340baf62e63c82b
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.
@@ -85,6 +85,12 @@ splunk_uf_tgz_checksum: 874c1bf7670b8d2efcacb269adfb7cd7
 # (Workload Management supported) 
 # (>= 7.2.2)
 #------------------------------------
+
+# 8.0.x
+
+# splunk_version: 8.0.0
+# splunk_tgz: splunk-8.0.0-1357bef0a7f6-Linux-x86_64.tgz
+# splunk_tgz_checksum: e4dd7986af1740504340baf62e63c82b
 
 # 7.3.x
 
