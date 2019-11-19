@@ -86,6 +86,12 @@
     recurse: yes
   become: yes  
 
+- name: Ensure default Splunk systemd unit file does not already exist
+  file:
+    path: /etc/systemd/system/Splunkd.service
+    state: absent
+  become: yes
+
 - name: -initd- Start Splunk for the first time
   command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
   become: yes  
