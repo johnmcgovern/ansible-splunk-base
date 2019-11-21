@@ -28,7 +28,7 @@ splunk_uf_pass: splunker
 
 
 #
-# Reasonable Defaults
+# Splunk Installation & OS Level Defaults
 # (The variables are reasonable defaults and can be safely left alone)
 #
 
@@ -47,6 +47,12 @@ splunk_uf_home: /opt/splunkforwarder
 # Checksum algorithm (md5 is the default)
 splunk_tgz_checksum_alg: md5
 splunk_uf_tgz_checksum_alg: md5
+
+
+#
+# Splunk Configuration Settings
+# (These settings impact how Splunk is initially configured.)
+#
 
 # Disable update checking (false or true)
 check_for_updates: false
