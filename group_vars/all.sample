@@ -54,7 +54,7 @@ splunk_uf_tgz_checksum_alg: md5
 # (These settings impact how Splunk is initially configured.)
 #
 
-# Disable update checking (false or true)
+# Allow Splunk to check for updates? (false or true)
 check_for_updates: false
 
 
