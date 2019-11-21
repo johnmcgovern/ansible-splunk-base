@@ -1,7 +1,7 @@
 
-#===============================
-# Base Splunk Install Variables
-#===============================
+#========================================
+# Ansible, OS, & Splunk Config Variables 
+#========================================
 
 #
 # Change These:
@@ -75,9 +75,9 @@ install_method: systemd
 
 
 
-#==================================================
-# Splunk Universal Forwarder (UF) Version Selector
-#==================================================
+#=============================================
+# Splunk Universal Forwarder Version Selector
+#=============================================
 
 # splunk_uf_version: 8.0.0
 # splunk_uf_tgz: splunkforwarder-8.0.0-1357bef0a7f6-Linux-x86_64.tgz
@@ -87,7 +87,8 @@ install_method: systemd
 
 
 #===============================================================
-# Splunk Enterprise Version Library (uncomment and copy to use) 
+# Splunk Enterprise Version Library 
+# (uncomment and copy to use) 
 #===============================================================
 
 # Systemd supported versions 
@@ -209,7 +210,8 @@ install_method: systemd
 
 
 #========================================================================
-# Splunk Universal Forwarder Version Library (uncomment and copy to use) 
+# Splunk Universal Forwarder Version Library 
+# (uncomment and copy to use) 
 #========================================================================
 
 # 8.0.x
