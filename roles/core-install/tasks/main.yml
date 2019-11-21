@@ -50,13 +50,13 @@
     remote_src: yes
   become: yes
 
-- name: Create user-seed.conf file for default admin creds
+- name: -user-seed.conf- Create file for default admin creds
   template:
     src: user-seed.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/user-seed.conf"
   become: yes
 
-- name: "Touch {{ splunk_home }}/etc/.ui_login"
+- name: "-.ui_login- Touch {{ splunk_home }}/etc/.ui_login"
   file:
     path: "{{ splunk_home }}/etc/.ui_login"
     state: touch
@@ -65,17 +65,31 @@
     group: "{{ os_group }}"
   become: yes   
 
-- name: Create user-prefs.conf file for default user/UI preferences
+- name: -user-prefs.conf- Create file for default user/UI preferences
   template:
     src: user-prefs.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/user-prefs.conf"
   become: yes
 
-- name: Create ui-tour.conf to disable default search tour
+- name: -ui-tour.conf- Create file to disable default search tour
   template:
     src: ui-tour.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/ui-tour.conf"
   become: yes
+
+- name: -web.conf- Create file to disable SSL and set up file for additional adds
+  template:
+    src: web.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/web.conf"
+  become: yes 
+
+- name: -web.conf- Disable auto update checking
+  lineinfile:
+    path: "{{ splunk_home }}/etc/system/local/web.conf"
+    line: updateCheckerBaseURL = 0
+    insertafter: '[settings]'
+  become: yes
+  when: not check_for_updates
 
 - name: Set {{ splunk_home }} owner & group recursively
   file:
