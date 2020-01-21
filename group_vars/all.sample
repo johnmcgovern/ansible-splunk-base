@@ -108,6 +108,10 @@ install_method: systemd
 
 # 7.3.x
 
+# splunk_version: 7.3.4
+# splunk_tgz: splunk-7.3.4-13e97039fb65-Linux-x86_64.tgz
+# splunk_tgz_checksum: 9acf21d68dade2eb69748a7ff40de61a
+
 # splunk_version: 7.3.3
 # splunk_tgz: splunk-7.3.3-7af3758d0d5e-Linux-x86_64.tgz
 # splunk_tgz_checksum: ff699d328dd64d16c1ce71ba983e40b0
