@@ -69,16 +69,10 @@
   command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
   become: yes  
   become_user: "{{ os_user }}"
-  when: install_method == "initd"
 
-- name: -systemd & initd- Splunk enable boot-start
+- name: -initd- Splunk enable boot-start
   command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
   become: yes  
-
-- name: -systemd- Start Splunk for the first time
-  command: "systemctl start SplunkForwarder"
-  become: yes
-  when: install_method == "systemd"
   
 - name: "Create symlink to splunk in /usr/local/bin"
   file:
