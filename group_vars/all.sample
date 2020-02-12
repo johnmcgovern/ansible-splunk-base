@@ -79,9 +79,9 @@ install_method: systemd
 # Splunk Universal Forwarder Version Selector
 #=============================================
 
-splunk_uf_version: 8.0.1
-splunk_uf_tgz: splunkforwarder-8.0.1-6db836e2fb9e-Linux-x86_64.tgz
-splunk_uf_tgz_checksum: 87d3e366ac8a63abcd2e67186f7a1305
+splunk_uf_version: 8.0.2
+splunk_uf_tgz: splunkforwarder-8.0.2-a7f645ddaf91-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: 339be950b6e11341f30d7d8cdb88d921
 
 
 
@@ -243,6 +243,10 @@ splunk_uf_tgz_checksum: 87d3e366ac8a63abcd2e67186f7a1305
 #========================================================================
 
 # 8.0.x
+
+# splunk_uf_version: 8.0.2
+# splunk_uf_tgz: splunkforwarder-8.0.2-a7f645ddaf91-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: 339be950b6e11341f30d7d8cdb88d921
 
 # splunk_uf_version: 8.0.1
 # splunk_uf_tgz: splunkforwarder-8.0.1-6db836e2fb9e-Linux-x86_64.tgz
