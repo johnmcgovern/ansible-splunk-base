@@ -64,9 +64,9 @@ check_for_updates: false
 #===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 8.0.1
-splunk_tgz: splunk-8.0.1-6db836e2fb9e-Linux-x86_64.tgz
-splunk_tgz_checksum: c249d5312a05de832d7f9e298f505ad0
+splunk_version: 8.0.2
+splunk_tgz: splunk-8.0.2-a7f645ddaf91-Linux-x86_64.tgz
+splunk_tgz_checksum: 0f9d49a4a609e588107923c40fe61230
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.
@@ -97,6 +97,10 @@ splunk_uf_tgz_checksum: 87d3e366ac8a63abcd2e67186f7a1305
 #------------------------------------
 
 # 8.0.x
+
+# splunk_version: 8.0.2
+# splunk_tgz: splunk-8.0.2-a7f645ddaf91-Linux-x86_64.tgz
+# splunk_tgz_checksum: 0f9d49a4a609e588107923c40fe61230
 
 # splunk_version: 8.0.1
 # splunk_tgz: splunk-8.0.1-6db836e2fb9e-Linux-x86_64.tgz
