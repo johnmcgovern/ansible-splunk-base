@@ -13,7 +13,7 @@
     url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_version }}&product=splunk&filename={{ splunk_tgz }}&wget=true
     checksum: "{{ splunk_tgz_checksum_alg }}:{{ splunk_tgz_checksum }}"
     dest: /home/{{ os_user }}
-    mode: 0640  
+    mode: '0640'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes

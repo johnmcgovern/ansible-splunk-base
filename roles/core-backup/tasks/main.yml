@@ -4,7 +4,7 @@
   file:
     path: /home/{{ os_user }}/config-backups
     state: directory
-    mode: 0755  
+    mode: '0755'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
@@ -14,7 +14,7 @@
     path: "{{ splunk_home }}/etc"
     dest: "/home/{{ os_user }}/config-backups/splunk-etc-temp.tgz"
     format: gz
-    mode: 0644  
+    mode: '0644'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
