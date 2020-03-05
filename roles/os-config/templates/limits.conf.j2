@@ -47,11 +47,15 @@
 #        - nice - max nice priority allowed to raise to values: [-20, 19]
 #        - rtprio - max realtime priority
 #
-# <domain>      <type>  <item>         <value>
+# <domain> <type> <item> <value>
 
-@{{ os_user }}     soft     nofile     64000
-@{{ os_user }}     hard     nofile     64000
-@{{ os_user }}     soft     nproc      64000
-@{{ os_user }}     hard     nproc      64000
+@{{ os_user }} hard core 0
+@{{ os_user }} hard maxlogins 10
+@{{ os_user }} soft nofile 65535
+@{{ os_user }} hard nofile 65535
+@{{ os_user }} soft nproc 20480
+@{{ os_user }} hard nproc 20480
+@{{ os_user }} soft fsize unlimited
+@{{ os_user }} hard fsize unlimited
 
 # End of file
