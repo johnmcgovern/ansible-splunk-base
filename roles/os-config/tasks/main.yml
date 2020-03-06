@@ -28,28 +28,37 @@
   become: yes
 
 
-- name: Set /etc/security/limits.conf for "{{ os_user }}" user
+- name: -ulimits- Set /etc/security/limits.conf for "{{ os_user }}" user
   template:
     src: limits.conf.j2
     dest: "/etc/security/limits.conf"
   become: yes
 
 
-- name: -THP- Disable Transparent Huge Pages (THP) Redhat part 1
-  command: "echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled"
-  become: yes 
+- name: -THP- Install disable-thp script to be run at boottime
+  template:
+    src: disable-thp.j2
+    dest: "/usr/local/bin/disable-thp"
+    mode: '0754'
+  become: yes
 
-- name: -THP- Disable Transparent Huge Pages (THP) Redhat part 2
-  command: "echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag"
-  become: yes   
+- name: -THP- Install disable-thp systemd unit file
+  template:
+    src: disable-thp.service.j2
+    dest: "/etc/systemd/system/disable-thp.service"
+    mode: '0644'
+  become: yes  
 
-- name: -THP- Disable Transparent Huge Pages (THP) - Linux Part 1
-  command: "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
-  become: yes   
+- name: -THP- Configure systemd to run disable-thp at boot time
+  systemd:
+    name: disable-thp
+    enabled: yes
+    masked: no
+  become: yes
 
-- name: -THP- Disable Transparent Huge Pages (THP) - Linux Part 2
-  command: "echo never > /sys/kernel/mm/transparent_hugepage/defrag"
-  become: yes   
+- name: -THP- Run the disable-thp script
+  command: disable-thp
+  become: yes     
 
 
 - name: -Ubuntu Updates- Run the equivalent of "apt-get update" as a separate step

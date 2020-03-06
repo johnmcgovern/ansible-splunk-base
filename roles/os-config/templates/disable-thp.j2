@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#SPLUNK: disable THP at boot time
+THP=`find /sys/kernel/mm/ -name transparent_hugepage -type d | tail -n 1`
+for SETTING in "enabled" "defrag";do
+    if test -f ${THP}/${SETTING}; then
+        echo never > ${THP}/${SETTING}
+    fi
+done
