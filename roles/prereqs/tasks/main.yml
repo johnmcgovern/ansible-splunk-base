@@ -1,5 +1,6 @@
 ---
 
 - name: Install python-minimal if not already available
-  raw: sudo bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal)"
+  raw: sudo bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal) || (yum  -y install python2)"
   become: yes
+  ignore_errors: yes

@@ -57,7 +57,7 @@
   become: yes
 
 - name: -THP- Run the disable-thp script
-  command: disable-thp
+  command: /usr/local/bin/disable-thp
   become: yes     
 
 
