@@ -67,6 +67,7 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 This role is tested on:
 
 - Ubuntu 18.04 Server (LTS)
+- RHEL 8
 - CentOS 7 1810
 
 
