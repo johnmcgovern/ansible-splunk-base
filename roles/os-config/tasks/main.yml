@@ -76,9 +76,9 @@
   when: ansible_distribution == "Ubuntu"    
 
 
-- name: -RedHat, CentOS, and Amazon Linux Updates-
+- name: -RedHat & CentOS Updates-
   yum:
     name: "*"
     state: latest  
   become: yes
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Amazon'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
