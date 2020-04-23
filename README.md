@@ -69,6 +69,7 @@ This role is tested on:
 - Ubuntu 18.04 Server (LTS)
 - RHEL 8
 - CentOS 7 1810
+- Amazon Linux 2 2020.04
 
 
 ### Notes
