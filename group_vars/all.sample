@@ -58,6 +58,28 @@ splunk_uf_tgz_checksum_alg: md5
 check_for_updates: false
 
 
+#
+# Universal Forwarder Configuration Settings
+# (These settings impact how the UF is initially configured.)
+#
+
+# -DS- Have Ansible point the UF at a Splunk deployment server
+uf_deploy_server_configured: false
+
+# -DS- The address of the deployment server (IP or FQDN).
+# Only used if uf_deploy_server_configured is set to true.
+uf_deploy_server_address: 127.0.0.1
+
+
+# -UF Logs- Sets the UF to foward its internal logs to the indexer tier.
+uf_forward_internal_logs: false
+
+# -UF Logs- The address of the indexer or HF (FQDN) for outputs.conf.
+# Only used if uf_forward_internal_logs is set to true.
+uf_forward_internal_logs_address: 127.0.0.1
+
+
+
 
 #===========================================
 # Splunk Enterprise (Core) Version Selector
