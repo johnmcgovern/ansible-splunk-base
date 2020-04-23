@@ -1,18 +1,18 @@
 ---
 
-- name: Create /home/{{ os_user }}/config-backups dir
+- name: Create /home/{{ os_user }}/backups dir
   file:
-    path: /home/{{ os_user }}/config-backups
+    path: /home/{{ os_user }}/backups
     state: directory
     mode: '0755'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
 
-- name: Archive (tgz) {{ splunk_home }}/etc to /home/{{ os_user }}/config-backups
+- name: Archive (tgz) {{ splunk_home }}/etc to /home/{{ os_user }}/backups
   archive:
     path: "{{ splunk_home }}/etc"
-    dest: "/home/{{ os_user }}/config-backups/splunk-etc-temp.tgz"
+    dest: "/home/{{ os_user }}/backups/splunk-etc-temp.tgz"
     format: gz
     mode: '0644'  
     owner: "{{ os_user }}"
@@ -20,6 +20,6 @@
   become: yes
 
 - name: Name backup file with timestamp
-  command: mv /home/{{ os_user }}/config-backups/splunk-etc-temp.tgz /home/{{ os_user }}/config-backups/splunk-etc-{{ inventory_hostname }}-{{ lookup('pipe', 'date +"%Y-%m-%d--%H-%M-%S"') }}.tgz
+  command: mv /home/{{ os_user }}/backups/splunk-etc-temp.tgz /home/{{ os_user }}/backups/splunk-etc-{{ inventory_hostname }}-{{ lookup('pipe', 'date +"%Y-%m-%d--%H-%M-%S"') }}.tgz
   become: yes
   become_user: "{{ os_user }}"
