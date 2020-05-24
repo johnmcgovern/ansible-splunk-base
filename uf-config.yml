@@ -1,0 +1,15 @@
+---
+# This playbook configures an already installed UF (uf-install.yml) to:
+#  1) Connect to the deployment server.
+#  2) Forward _internal logs to the indexer tier.
+
+- name: Apply prereqs to all nodes
+  hosts: all
+  gather_facts: no
+  roles:
+    - prereqs
+
+- name: Configure Splunk Universal Forwarder
+  hosts: all
+  roles:
+    - uf-config

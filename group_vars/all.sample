@@ -60,23 +60,21 @@ check_for_updates: false
 
 #
 # Universal Forwarder Configuration Settings
-# (These settings impact how the UF is initially configured.)
+# (These settings impact how the UF is configured in uf-config.yml.)
 #
 
-# -DS- Have Ansible point the UF at a Splunk deployment server
-uf_deploy_server_configure: false
-
-# -DS- The address of the deployment server (IP or FQDN).
-# Only used if uf_deploy_server_configured is set to true.
+# -UF- The address of the deployment server (IP or FQDN).
 uf_deploy_server_address: 127.0.0.1
 
+# -UF- The port of the deployment server (defaults to 8089).
+uf_deploy_server_port: 8089
 
-# -UF Logs- Sets the UF to foward its internal logs to the indexer tier.
-uf_forward_internal_logs: false
-
-# -UF Logs- The address of the indexer or HF (FQDN) for outputs.conf.
-# Only used if uf_forward_internal_logs is set to true.
+# -UF- The address of the indexer, heavy forwarder, or cluster master (FQDN or IP) for outputs.conf.
+# Currently, only a single address is supported.
 uf_forward_internal_logs_address: 127.0.0.1
+
+# -UF- The address of the indexer, heavy forwarder, or cluster master's receiving port for outputs.conf
+uf_forward_internal_logs_port: 9997
 
 
 

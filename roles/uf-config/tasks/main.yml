@@ -1,0 +1,17 @@
+---
+
+- name: -UF- Create outputs.conf for default log forwarding
+  template:
+    src: outputs.conf.j2
+    dest: "{{ splunk_uf_home }}/etc/system/local/outputs.conf"
+  become: yes
+
+- name: -DS- Set the deployment server name or IP
+  command: "{{ splunk_uf_home }}/bin/splunk set deploy-poll {{ uf_deploy_server_address }}:{{ uf_deploy_server_port }} -auth {{ splunk_uf_user }}:{{ splunk_uf_pass }}"
+  become: yes  
+  become_user: "{{ os_user }}"
+
+- name: -initd- Restart Splunk UF
+  command: "{{ splunk_uf_home }}/bin/splunk restart"
+  become: yes  
+  become_user: "{{ os_user }}"

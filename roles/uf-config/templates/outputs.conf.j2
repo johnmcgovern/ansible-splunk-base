@@ -1,0 +1,17 @@
+#
+# Forward _internal UF logs to indexer tier
+# https://docs.splunk.com/Documentation/Splunk/latest/DistSearch/Forwardsearchheaddata
+#
+
+# Turn off indexing on the search head
+[indexAndForward]
+index = false
+ 
+[tcpout]
+defaultGroup = my_search_peers 
+forwardedindex.filter.disable = true  
+indexAndForward = false 
+ 
+[tcpout:my_search_peers]
+server={{ uf_forward_internal_logs_address }}:{{ uf_forward_internal_logs_port }}
+

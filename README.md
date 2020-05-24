@@ -49,15 +49,33 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 		- ansible-playbook -i hosts upgrade.yml
 
-4. -or- run the Splunk configuration backup playbook
-
-		- ansible-playbook -i hosts backup.yml
-
-5. -or- run the Splunk OS initial configuration playbook
+4. -or- run the Splunk OS initial configuration playbook (built to provide a simple configuration for lab hosts)
 
 		- ansible-playbook -i hosts os-config.yml
 
-6. Run the Ansible playbook limited to certain hosts within the hosts list
+5. -or- run a base OS config AND install Splunk.
+
+		- ansible-playbook -i hosts install-combo.yml				
+
+6. -or- run the Splunk UF install playbook
+
+		- ansible-playbook -i hosts uf-install.yml
+
+7. -or- run the Splunk UF config playbook
+
+		- ansible-playbook -i hosts uf-config.yml
+
+8. -or- run the Splunk UF install AND config playbook
+
+		- ansible-playbook -i hosts uf-combo.yml				
+
+9. -or- run the Splunk configuration backup playbook
+
+		- ansible-playbook -i hosts backup.yml
+
+
+
+8. Run an Ansible playbook limited to certain hosts within the hosts list
 
 		- ansible-playbook -i hosts --limit=host1 install.yml
 
@@ -76,19 +94,25 @@ This role is tested on:
 ### Notes
 
 - The goal of this role is to quickly execute a best-practices base Splunk install/upgrade (including support for Workload Management which is a departure from the previous install method).
+- There are more complex / full-featured projects out there for complex deployments. The goal hear is simplicity, speed, and utility.
 - Both "systemd" and "initd" methods of Linux process managemenent are supported. systemd is ONLY available in Splunk Enteprise version 7.2.2 and later. 
 - Splunk versions 7.2.2 - 7.2.x implement "enable boot-start" differently than 7.3.0 and later. This is now accounted for.
 - Assuming a semi-default install (such as you would find if you installed with this playbook), upgrade.yml will convert from initd process management to systemd process management if you flag "systemd" on install_method.
 - A number of config items are set which disable pop-ups and modal dialogues which would normally be shown to the Splunk admin and/or users such as new version available notifications, UI tours, and python 2.7 deprication notifications. The goal here is to generally avoid UI annoyances that would crop up in automatic distributed Splunk deployments.
 - This Ansible playbook does not currently handle OS level firewall allowances for splunkd TCP ports.
+- We bias towards being non-destructive. For example, if we see an existing / previous Splunk install we will fail out rather than damage the current install. 
 
 ### To-Do
 
-- Optional firewall allowances for splunkd.
 - Support for additional server settings.
 - Support for roles such as indexer, standalone search head, search head cluster, cluster master, license master, deployment server, deployer, monitoring console, etc.
 - Automated app install.
 - Simplified version/file/hash dictionary.
+
+
+### Warranty
+
+This project is provided WITHOUT any form of warrany and should be tested throughly before using it in your enviornment. Development is best-effort only. This project is provided as-is with no guarantee as to fitness for a specific purpose. Please use at your own risk.
 
 
 ### Contact

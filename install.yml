@@ -1,11 +1,18 @@
 ---
-# This playbook deploys a basic Splunk Enterprise (Core) installation
+# This playbook:
+#  1) Performs a basic OS configuration for lab hosts.
+#  2) Installs a base image of Splunk Enterprise.
 
 - name: Apply prereqs to all nodes
   hosts: all
   gather_facts: no
   roles:
     - prereqs
+
+- name: OS Baseline Configuration
+  hosts: all
+  roles:
+    - os-config    
 
 - name: Install Splunk
   hosts: all
