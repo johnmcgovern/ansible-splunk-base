@@ -7,7 +7,7 @@
   roles:
     - prereqs
 
-- name: OS Baseline Configuration
+- name: Basic OS Configuration & Updates
   hosts: all
   roles:
     - os-config
