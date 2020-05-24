@@ -93,14 +93,14 @@ This role is tested on:
 
 ### Notes
 
-- The goal of this role is to quickly execute a best-practices base Splunk install/upgrade (including support for Workload Management which is a departure from the previous install method).
-- There are more complex / full-featured projects out there for complex deployments. The goal hear is simplicity, speed, and utility.
-- Both "systemd" and "initd" methods of Linux process managemenent are supported. systemd is ONLY available in Splunk Enteprise version 7.2.2 and later. 
+- The goal of this role is to quickly execute a best-practices base Splunk install/upgrade (including support for Workload Management, which is a departure from the previous install method).
+- There are more complex/full-featured projects out there for various deployment topologies. The goal here is simplicity, speed, and utility.
+- Both "systemd" and "initd" methods of Linux process management are supported. systemd is ONLY available in Splunk Enterprise version 7.2.2 and later. 
 - Splunk versions 7.2.2 - 7.2.x implement "enable boot-start" differently than 7.3.0 and later. This is now accounted for.
 - Assuming a semi-default install (such as you would find if you installed with this playbook), upgrade.yml will convert from initd process management to systemd process management if you flag "systemd" on install_method.
 - A number of config items are set which disable pop-ups and modal dialogues which would normally be shown to the Splunk admin and/or users such as new version available notifications, UI tours, and python 2.7 deprication notifications. The goal here is to generally avoid UI annoyances that would crop up in automatic distributed Splunk deployments.
-- This Ansible playbook does not currently handle OS level firewall allowances for splunkd TCP ports.
-- We bias towards being non-destructive. For example, if we see an existing / previous Splunk install we will fail out rather than damage the current install. 
+- This Ansible playbook does not currently handle OS-level firewall allowances for splunkd TCP ports.
+- We bias towards being non-destructive. For example, if we see an existing/previous Splunk install we will fail out rather than damage the current install. 
 
 ### To-Do
 
@@ -112,7 +112,7 @@ This role is tested on:
 
 ### Warranty
 
-This project is provided WITHOUT any form of warrany and should be tested throughly before using it in your enviornment. Development is best-effort only. This project is provided as-is with no guarantee as to fitness for a specific purpose. Please use at your own risk.
+This project is provided WITHOUT any form of warranty and should be tested thoroughly before using it in your environment. Development is best-effort only. This project is provided as-is with no guarantee as to fitness for a specific purpose. Please use it at your own risk.
 
 
 ### Contact
