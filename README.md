@@ -55,7 +55,7 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 5. -or- run a base OS config AND install Splunk.
 
-		- ansible-playbook -i hosts install-combo.yml				
+		- ansible-playbook -i hosts combo.yml				
 
 6. -or- run the Splunk UF install playbook
 
