@@ -35,7 +35,7 @@
   become: yes
 
 
-- name: -THP- Install disable-thp script to be run at boottime
+- name: -THP- Install disable-thp script to be run at boot time
   template:
     src: disable-thp.j2
     dest: "/usr/local/bin/disable-thp"
