@@ -19,12 +19,12 @@ ansible_ssh_private_key_file: ~/.ssh/id_rsa
 # Username and password for Splunk Enterprise admin user
 #   (used during initial install, not during upgrade)
 splunk_user: admin
-splunk_pass: splunker
+splunk_pass: splunk123
 
 # Username and password for Splunk Universal Forwarder admin user
 #   (used during initial install, not during upgrade)
 splunk_uf_user: ufadmin
-splunk_uf_pass: splunker
+splunk_uf_pass: splunk123
 
 
 #

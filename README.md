@@ -1,6 +1,6 @@
 # Ansible-Splunk-Base
 
-This is an Ansible project that installs or upgrades Splunk to a specific version. It can also perform basic OS config (ulimits, THP disabled, hostname, etc.) and ./splunk/etc/ backups.
+This is an Ansible project that installs or upgrades Splunk to a specific version. It can also perform basic OS config (ulimits, THP disabled, hostname, etc.), ./splunk/etc/ backups, and SSL cert installation.
 
 
 ### Setup
@@ -55,30 +55,35 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 5. -or- run a base OS config AND install Splunk.
 
-		- ansible-playbook -i hosts combo.yml				
+		- ansible-playbook -i hosts combo.yml	
 
-6. -or- run the Splunk UF install playbook
+6. -or- configure an TLS/SSL key pair for the web UI (tcp/8000).
+
+		- ansible-playbook -i hosts tls-config.yml						
+
+7. -or- run the Splunk UF install playbook
 
 		- ansible-playbook -i hosts uf-install.yml
 
-7. -or- run the Splunk UF config playbook
+8. -or- run the Splunk UF config playbook
 
 		- ansible-playbook -i hosts uf-config.yml
 
-8. -or- run the Splunk UF install AND config playbook
+9. -or- run the Splunk UF install AND config playbook
 
 		- ansible-playbook -i hosts uf-combo.yml				
 
-9. -or- run the Splunk configuration backup playbook
+10. -or- run the Splunk configuration backup playbook
 
 		- ansible-playbook -i hosts backup.yml
 
-
-
-8. Run an Ansible playbook limited to certain hosts within the hosts list
+11. Run an Ansible playbook limited to certain hosts within the hosts list
 
 		- ansible-playbook -i hosts --limit=host1 install.yml
 
+11. Run multiple roles in one command
+
+		- ansible-playbook -i hosts os-config install.yml tls-config.yml
 
 ### Compatibility
 
@@ -105,8 +110,6 @@ This role is tested on:
 ### To-Do
 
 - Support for additional server settings.
-- Support for roles such as indexer, standalone search head, search head cluster, cluster master, license master, deployment server, deployer, monitoring console, etc.
-- Automated app install.
 - Simplified version/file/hash dictionary.
 
 

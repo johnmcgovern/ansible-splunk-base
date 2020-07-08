@@ -108,6 +108,14 @@ venv.bak/
 
 # Project specific
 group_vars/all
+
 *hosts*
 !hosts.sample
+
 *.retry
+
+files/*
+!files/README.md
+
+certs/*
+!certs/README.md

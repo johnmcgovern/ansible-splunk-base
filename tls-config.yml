@@ -1,0 +1,13 @@
+---
+# This playbook configures a Splunk instance to use a 3rd party SSL/TLS key pair.
+
+- name: Apply prereqs to all nodes
+  hosts: all
+  gather_facts: no
+  roles:
+    - prereqs
+
+- name: Apply SSL/TLS cert to web UI port (default tcp/8000)
+  hosts: all
+  roles:
+    - tls-config
