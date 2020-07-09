@@ -1,10 +1,16 @@
 ---
 
+- name: Check if cloud-init exists on this system
+  stat:
+    path: /etc/cloud/
+  register: cloud_init_exists
+
 - name: Tell cloud-init that its job is done (preserves hostname through reboots)
   file:
     path: /etc/cloud/cloud-init.disabled
     state: touch
   become: yes 
+  when: cloud_init_exists == True
 
 - name: Set the hostname as per the Ansible inventory file
   hostname:
@@ -59,6 +65,26 @@
 - name: -THP- Run the disable-thp script
   command: /usr/local/bin/disable-thp
   become: yes     
+
+
+- name: -firewalld- Check if /usr/sbin/firewalld exists
+  stat: 
+    path: /usr/sbin/firewalld
+  register: firewalld_flag
+
+- name: -firewalld-  Allow tcp/8000 traffic through firewalld
+  firewalld:
+    port: "8000/tcp"
+    permanent: yes
+    state: enabled
+  become: yes  
+  when: firewalld_flag.stat.exists == True
+
+- name: -firewalld- Reload firewalld rules while maintaining session state (be nice to Ansible)   
+  command: 
+    cmd: firewall-cmd --reload
+  become: yes  
+  when: firewalld_flag.stat.exists == True  
 
 
 - name: -Ubuntu Updates- Run the equivalent of "apt-get update" as a separate step
