@@ -43,11 +43,13 @@
   become: yes
   when: splunk_tgz_downloaded_flag.stat.exists == False
 
-- name: Extract {{ splunk_tgz }} to {{ splunk_home }}
+- name: Extract {{ splunk_tgz }} to {{ splunk_home }} to install
   unarchive:
     src: /home/{{ os_user }}/{{ splunk_tgz }}
     dest: "{{ splunk_home }}/.."
     remote_src: yes
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
   become: yes
 
 - name: -user-seed.conf- Create file for default admin creds

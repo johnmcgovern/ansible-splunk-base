@@ -16,6 +16,7 @@
     mode: '0640'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
+    timeout: 20
   become: yes
   when: splunk_tgz_downloaded_flag.stat.exists == False
 
@@ -47,8 +48,9 @@
     src: /home/{{ os_user }}/{{ splunk_tgz }}
     dest: "{{ splunk_home }}/.."
     remote_src: yes
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
   become: yes
-  become_user: "{{ os_user }}"
 
 - name: -initd- Start Splunk for the first time post upgrade
   command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
