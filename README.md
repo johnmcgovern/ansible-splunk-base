@@ -71,23 +71,28 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 9. -or- run the Splunk UF install AND config playbook
 
-		- ansible-playbook -i hosts uf-combo.yml				
+		- ansible-playbook -i hosts uf-combo.yml	
 
-10. -or- run the Splunk configuration backup playbook
+10. -or- run the Splunk UF upgrade playbook
+
+		- ansible-playbook -i hosts uf-upgrade.yml					
+
+11. -or- run the Splunk configuration backup playbook
 
 		- ansible-playbook -i hosts backup.yml
 
-11. Run an Ansible playbook limited to certain hosts within the hosts list
+12. Run an Ansible playbook limited to certain hosts within the hosts list
 
 		- ansible-playbook -i hosts --limit=host1 install.yml
 
-11. Run multiple roles in one command
+13. Run multiple roles in one command
 
 		- ansible-playbook -i hosts os-config install.yml tls-config.yml
 
+
 ### Compatibility
 
-This role is tested on:
+This role has been tested on:
 
 - Ubuntu 20.04 Server (LTS)
 - Ubuntu 18.04 Server (LTS)

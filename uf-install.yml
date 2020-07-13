@@ -11,5 +11,3 @@
   hosts: all
   roles:
     - uf-install
-
-

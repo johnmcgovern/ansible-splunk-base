@@ -1,0 +1,13 @@
+---
+# This playbook upgrades the Splunk Universal Forwarder
+
+- name: Apply prereqs to all nodes
+  hosts: all
+  gather_facts: no
+  roles:
+    - prereqs
+
+- name: Upgrade Splunk Universal Forwarder
+  hosts: all
+  roles:
+    - uf-upgrade

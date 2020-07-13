@@ -1,21 +1,6 @@
 ---
 
-- name: Add {{ os_group }} group
-  group:
-    name: "{{ os_group }}"
-    state: present  
-  become: yes  
-
-- name: Add {{ os_user }} user
-  user:
-    name: "{{ os_user }}"
-    group: "{{ os_group }}"
-    home: /home/{{ os_user }}
-    shell: /bin/bash
-    comment: Splunk User
-  become: yes
-
-- name: Create {{ splunk_uf_home }} dir
+- name: Ensure {{ splunk_uf_home }} dir exists
   file:
     path: "{{ splunk_uf_home }}"
     state: directory
@@ -23,6 +8,12 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
+
+- name: -initd- Stop the UF
+  command: "{{ splunk_uf_home }}/bin/splunk stop"
+  become: yes  
+  become_user: "{{ os_user }}"  
+
 
 - name: Check for the presence of /home/{{ os_user }}/{{ splunk_uf_tgz }}
   stat: 
@@ -44,19 +35,13 @@
   become: yes
   when: splunk_uf_tgz_downloaded_flag.stat.exists == False
 
-- name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to install
+- name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to upgrade
   unarchive:
     src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
     dest: "{{ splunk_uf_home }}/.."
     remote_src: yes
     owner: "{{ os_user }}"
     group: "{{ os_group }}"    
-  become: yes
-
-- name: Create user-seed.conf file for default admin creds
-  template:
-    src: user-seed.conf.j2
-    dest: "{{ splunk_uf_home }}/etc/system/local/user-seed.conf"
   become: yes
 
 - name: Set {{ splunk_uf_home }} owner & group recursively
@@ -68,7 +53,8 @@
     recurse: yes
   become: yes  
 
-- name: -initd- Start Splunk UF for the first time
+
+- name: -initd- Start Splunk UF
   command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
   become: yes  
   become_user: "{{ os_user }}"
@@ -76,6 +62,7 @@
 - name: -initd- Splunk enable boot-start
   command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
   become: yes  
+
   
 - name: "Create symlink to splunk in /usr/local/bin"
   file:

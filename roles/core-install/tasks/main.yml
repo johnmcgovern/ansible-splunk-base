@@ -40,6 +40,7 @@
     mode: '0640'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
+    timeout: 20
   become: yes
   when: splunk_tgz_downloaded_flag.stat.exists == False
 
