@@ -32,8 +32,9 @@
   file:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     state: file
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
   become: yes
-  become_user: "{{ os_user }}"
 
 - name: -config updates- Ensure web.conf contains the [settings] stanza
   lineinfile:
@@ -41,7 +42,6 @@
     line: "[settings]"
     state: present
   become: yes
-  become_user: "{{ os_user }}"    
 
 - name: -config updates- Add serverCert attribute to [settings]
   lineinfile:
@@ -50,7 +50,6 @@
     insertbefore: '^[settings]'
     line: 'serverCert = {{ splunk_home }}/etc/auth/my-certs/cert.pem'    
   become: yes
-  become_user: "{{ os_user }}"    
 
 - name: -config updates- Add privKeyPath attribute to [settings]
   lineinfile:
@@ -59,7 +58,6 @@
     insertbefore: '^[settings]'
     line: 'privKeyPath = {{ splunk_home }}/etc/auth/my-certs/privkey.pem'    
   become: yes
-  become_user: "{{ os_user }}"         
 
 - name: -config updates- Set enableSplunkWebSSL = 1
   replace:
@@ -68,13 +66,11 @@
     regexp: 'enableSplunkWebSSL = 0'
     replace: 'enableSplunkWebSSL = 1'
   become: yes
-  become_user: "{{ os_user }}"    
 
 
 - name: -initd- Restart splunkd to load the new key pair
   command: "{{ splunk_home }}/bin/splunk restart"
   become: yes  
-  become_user: "{{ os_user }}"
   when: 
     - install_method == "initd"
 
