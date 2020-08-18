@@ -93,7 +93,7 @@
   become: yes     
   when: ansible_distribution == "Ubuntu"      
 
-- name: -Ubuntu Updates- Update all packages to the latest version
+- name: -Ubuntu Updates- Update all packages to the latest version "apt-get upgrade"
   apt:
     name: "*"
     state: latest
