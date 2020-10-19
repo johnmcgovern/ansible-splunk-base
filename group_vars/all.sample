@@ -32,6 +32,11 @@ splunk_uf_pass: splunk123
 # (The variables are reasonable defaults and can be safely left alone)
 #
 
+# Whether to download (wget) the tgz installer from Splunk (true, default)
+#   or upload the tgz from the ./files/ directory of this project (false)
+download_tgz_from_splunk_servers: true
+download_uf_tgz_from_splunk_servers: true
+
 # Ansible connection defaults
 ansible_connection: smart
 ansible_port: 22
@@ -43,10 +48,6 @@ os_group: splunk
 # $SPLUNK_HOME path
 splunk_home: /opt/splunk
 splunk_uf_home: /opt/splunkforwarder
-
-# Checksum algorithm (md5 is the default)
-splunk_tgz_checksum_alg: md5
-splunk_uf_tgz_checksum_alg: md5
 
 
 #

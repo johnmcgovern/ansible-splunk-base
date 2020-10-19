@@ -24,7 +24,8 @@
     group: "{{ os_group }}"
   become: yes
 
-- name: Check for the presence of /home/{{ os_user }}/{{ splunk_tgz }}
+
+- name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_tgz }}
   stat: 
     path: /home/{{ os_user }}/{{ splunk_tgz }}
     get_checksum: yes  
@@ -32,19 +33,29 @@
   register: splunk_tgz_downloaded_flag
   become: yes
 
-- name: Download (wget) {{ splunk_tgz }}
+- name: -TGZ- Download (wget) {{ splunk_tgz }}
   get_url:
     url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_version }}&product=splunk&filename={{ splunk_tgz }}&wget=true
-    checksum: "{{ splunk_tgz_checksum_alg }}:{{ splunk_tgz_checksum }}"
+    checksum: "md5:{{ splunk_tgz_checksum }}"
     dest: /home/{{ os_user }}
     mode: '0640'  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     timeout: 20
   become: yes
-  when: splunk_tgz_downloaded_flag.stat.exists == False
+  when: splunk_tgz_downloaded_flag.stat.exists == False and download_tgz_from_splunk_servers 
 
-- name: Extract {{ splunk_tgz }} to {{ splunk_home }} to install
+- name: -TGZ- Upload ./files/{{ splunk_tgz }} (local) to /home/{{ os_user }}/ (remote)
+  copy:
+    src: "files/{{ splunk_tgz }}"
+    dest: /home/{{ os_user }}
+    mode: '0640'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+  when: splunk_tgz_downloaded_flag.stat.exists == False and not download_tgz_from_splunk_servers  
+
+- name: -TGZ- Extract {{ splunk_tgz }} to {{ splunk_home }} to install
   unarchive:
     src: /home/{{ os_user }}/{{ splunk_tgz }}
     dest: "{{ splunk_home }}/.."
@@ -52,6 +63,7 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
+
 
 - name: -user-seed.conf- Create file for default admin creds
   template:

@@ -12,28 +12,37 @@
 - name: -initd- Stop the UF
   command: "{{ splunk_uf_home }}/bin/splunk stop"
   become: yes  
-  become_user: "{{ os_user }}"  
 
 
 - name: Check for the presence of /home/{{ os_user }}/{{ splunk_uf_tgz }}
   stat: 
     path: /home/{{ os_user }}/{{ splunk_uf_tgz }}
     get_checksum: yes  
-    checksum_algorithm: "{{ splunk_uf_tgz_checksum_alg }}"
+    checksum_algorithm: md5
   register: splunk_uf_tgz_downloaded_flag
   become: yes
 
-- name: Download (wget) {{ splunk_uf_tgz }}
+- name: -TGZ- Download (wget) {{ splunk_uf_tgz }}
   get_url:
     url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_uf_version }}&product=universalforwarder&filename={{ splunk_uf_tgz }}&wget=true
-    checksum: "{{ splunk_uf_tgz_checksum_alg }}:{{ splunk_uf_tgz_checksum }}"
+    checksum: "md5:{{ splunk_uf_tgz_checksum }}"
     dest: /home/{{ os_user }}
     mode: 0640  
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     timeout: 20
   become: yes
-  when: splunk_uf_tgz_downloaded_flag.stat.exists == False
+  when: splunk_uf_tgz_downloaded_flag.stat.exists == False and download_uf_tgz_from_splunk_servers
+
+- name: -TGZ- Upload ./files/{{ splunk_uf_tgz }} (local) to /home/{{ os_user }}/ (remote)
+  copy:
+    src: "files/{{ splunk_uf_tgz }}"
+    dest: /home/{{ os_user }}
+    mode: '0640'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+  when: splunk_uf_tgz_downloaded_flag.stat.exists == False and not download_uf_tgz_from_splunk_servers   
 
 - name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to upgrade
   unarchive:
@@ -54,14 +63,13 @@
   become: yes  
 
 
-- name: -initd- Start Splunk UF
-  command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-  become: yes  
-  become_user: "{{ os_user }}"
-
 - name: -initd- Splunk enable boot-start
   command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes  
+  become: yes 
+
+- name: -initd- Start Splunk UF for the first time
+  command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: yes    
 
   
 - name: "Create symlink to splunk in /usr/local/bin"
