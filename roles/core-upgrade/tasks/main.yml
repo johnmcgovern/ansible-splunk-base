@@ -44,7 +44,6 @@
 - name: -initd- Stop Splunk pre-upgrade
   command: "{{ splunk_home }}/bin/splunk stop"
   become: yes  
-  become_user: "{{ os_user }}"
   when: initd_run_flag.stat.exists == True
 
 - name: -systemd- Stop Splunk pre-upgrade
@@ -66,7 +65,6 @@
 - name: -initd- Start Splunk for the first time post upgrade
   command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
   become: yes  
-  become_user: "{{ os_user }}"
   when: 
     - install_method == "initd"
 

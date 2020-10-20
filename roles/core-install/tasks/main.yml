@@ -121,11 +121,6 @@
     state: absent
   become: yes
 
-- name: -initd- Start Splunk for the first time
-  command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-  become: yes  
-  become_user: "{{ os_user }}"
-  when: install_method == "initd"
 
 - name: -initd & Splunk 7.2.1 or earlier- Splunk enable boot-start
   command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
@@ -140,6 +135,12 @@
   when: 
     - install_method == "initd" 
     - splunk_version is version('7.2.0', '>=')
+
+- name: -initd- Start Splunk for the first time
+  command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: yes  
+  when: install_method == "initd"
+
 
 - name: -systemd & Splunk 7.2.2 to 7.2.x- Splunk enable boot-start (no systemd arguments added)
   command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
@@ -178,7 +179,8 @@
   become: yes
   when: 
     - install_method == "systemd"
-  
+ 
+    
 - name: "Create symlink to splunk in /usr/local/bin"
   file:
     src: "{{ splunk_home }}/bin/splunk"
