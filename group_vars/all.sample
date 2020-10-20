@@ -85,9 +85,9 @@ uf_forward_internal_logs_port: 9997
 #===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 8.0.6
-splunk_tgz: splunk-8.0.6-152fb4b2bb96-Linux-x86_64.tgz
-splunk_tgz_checksum: 5a8edfd3808a8c0105ada9df7114ec38
+splunk_version: 8.1.0
+splunk_tgz: splunk-8.1.0-f57c09e87251-Linux-x86_64.tgz
+splunk_tgz_checksum: 3de8c518e87cefe38414aabdbdf46ff8
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.
@@ -100,9 +100,9 @@ install_method: systemd
 # Splunk Universal Forwarder Version Selector
 #=============================================
 
-splunk_uf_version: 8.0.6
-splunk_uf_tgz: splunkforwarder-8.0.6-152fb4b2bb96-Linux-x86_64.tgz
-splunk_uf_tgz_checksum: a7ad4bcdfab8c33766e9f03bcb511fd5
+splunk_uf_version: 8.1.0
+splunk_uf_tgz: splunkforwarder-8.1.0-f57c09e87251-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: 6a4e99c6287942feb0ad1e6b97a50721
 
 
 
@@ -116,6 +116,12 @@ splunk_uf_tgz_checksum: a7ad4bcdfab8c33766e9f03bcb511fd5
 # (Workload Management supported) 
 # (>= 7.2.2)
 #------------------------------------
+
+# 8.1.x
+
+# splunk_version: 8.1.0
+# splunk_tgz: splunk-8.1.0-f57c09e87251-Linux-x86_64.tgz
+# splunk_tgz_checksum: 3de8c518e87cefe38414aabdbdf46ff8
 
 # 8.0.x
 
@@ -306,6 +312,12 @@ splunk_uf_tgz_checksum: a7ad4bcdfab8c33766e9f03bcb511fd5
 # Splunk Universal Forwarder Version Library 
 # (uncomment and copy to use) 
 #========================================================================
+
+# 8.1.x
+
+# splunk_uf_version: 8.1.0
+# splunk_uf_tgz: splunkforwarder-8.1.0-f57c09e87251-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: 6a4e99c6287942feb0ad1e6b97a50721
 
 # 8.0.x
 
