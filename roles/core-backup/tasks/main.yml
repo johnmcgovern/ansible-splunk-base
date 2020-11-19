@@ -22,4 +22,3 @@
 - name: Name backup file with timestamp
   command: mv /home/{{ os_user }}/backups/splunk-etc-temp.tgz /home/{{ os_user }}/backups/splunk-etc-{{ inventory_hostname }}-{{ lookup('pipe', 'date +"%Y-%m-%d--%H-%M-%S"') }}.tgz
   become: yes
-  become_user: "{{ os_user }}"
