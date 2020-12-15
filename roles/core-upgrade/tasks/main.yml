@@ -82,12 +82,20 @@
     - splunk_version is version('7.2.2', '>=')
     - splunk_version is version('7.3', '<')    
 
-- name: -systemd & Splunk 7.3- For initd -> systemd upgrade rebuild systemd script
+- name: -systemd & Splunk 7.3 to 8.1.0- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1)
   command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes
-  when: 
-    - install_method == "systemd"  
-    - splunk_version is version('7.3', '>=')   
+  become: yes 
+  when:
+    - install_method == "systemd" 
+    - splunk_version is version('7.3', '>=')
+    - splunk_version is version('8.1.1', '<')
+
+- name: -systemd & Splunk 8.1.1 or later- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1) (-create-polkit-rules 1)
+  command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+  become: yes 
+  when:
+    - install_method == "systemd" 
+    - splunk_version is version('8.1.1', '>=')    
 
 - name: -systemd & Ubuntu- Fix the /etc/systemd/system/Splunkd.service file for Ubuntu support
   replace:
