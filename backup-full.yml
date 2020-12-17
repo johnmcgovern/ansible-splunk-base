@@ -1,0 +1,7 @@
+---
+# This playbook backs up all of $SPLUNK_HOME/ to $HOME_PATH/backups/
+
+- name: Backup all Splunk data in $SPLUNK_HOME including buckets to $HOME_PATH/backups/
+  hosts: all
+  roles:
+    - backup-full

@@ -4,4 +4,4 @@
 - name: Backup Splunk configuration
   hosts: all
   roles:
-    - core-backup
+    - backup-etc

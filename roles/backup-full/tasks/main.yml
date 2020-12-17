@@ -1,0 +1,24 @@
+---
+
+- name: Create /home/{{ os_user }}/backups dir
+  file:
+    path: /home/{{ os_user }}/backups
+    state: directory
+    mode: '0755'  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+- name: Archive (tgz) {{ splunk_home }}/ to /home/{{ os_user }}/backups
+  archive:
+    path: "{{ splunk_home }}/"
+    dest: "/home/{{ os_user }}/backups/splunk-full-temp.tgz"
+    format: gz
+    mode: '0644'  
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
+- name: Name backup file with timestamp
+  command: mv /home/{{ os_user }}/backups/splunk-full-temp.tgz /home/{{ os_user }}/backups/splunk-full-{{ inventory_hostname }}-{{ lookup('pipe', 'date +"%Y-%m-%d--%H-%M-%S"') }}.tgz
+  become: yes
