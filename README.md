@@ -77,15 +77,19 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 		- ansible-playbook -i hosts uf-upgrade.yml					
 
-11. -or- run the Splunk configuration backup playbook
+11. -or- run the Splunk configuration only (./etc/) backup playbook
 
-		- ansible-playbook -i hosts backup.yml
+		- ansible-playbook -i hosts backup-etc.yml
 
-12. Run an Ansible playbook limited to certain hosts within the hosts list
+12. -or- run the Splunk full backup (/opt/splunk/) playbook
+
+		- ansible-playbook -i hosts backup-full.yml		
+
+13. Run an Ansible playbook limited to certain hosts within the hosts list
 
 		- ansible-playbook -i hosts --limit=host1 install.yml
 
-13. Run multiple roles in one command
+14. Run multiple roles in one command
 
 		- ansible-playbook -i hosts os-config install.yml tls-config.yml
 
