@@ -92,6 +92,12 @@
     dest: "{{ splunk_home }}/etc/system/local/ui-tour.conf"
   become: yes
 
+- name: -limits.conf- Set reasonable saved search limits (increased) for ES
+  template:
+    src: limits.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/limits.conf"
+  become: yes 
+
 - name: -web.conf- Create file to disable SSL and set up file for additional adds
   template:
     src: web.conf.j2
