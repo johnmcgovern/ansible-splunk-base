@@ -164,6 +164,16 @@
     - splunk_version is version('7.3', '>=')
     - splunk_version is version('8.1.1', '<')
 
+- name: -polkit- Install "polkit" for 8.1.1 or later on CentOS, RHEL, and Amazon Linux
+  yum:
+    name: polkit
+    state: latest  
+  become: yes
+  when: 
+    - install_method == "systemd" 
+    - splunk_version is version('8.1.1', '>=')
+    - ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'  
+
 - name: -systemd & Splunk 8.1.1 or later- Splunk enable boot-start (-systemd-managed 1) (-create-polkit-rules 1)
   command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
   become: yes 
