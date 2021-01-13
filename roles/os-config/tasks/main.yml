@@ -87,7 +87,7 @@
   when: firewalld_flag.stat.exists == True  
 
 
-- name: -iptables- Redirect 443 to 8000
+- name: -iptables- Redirect 443 to 8000 (Ubuntu and Amazon Linux)
   command: iptables -A PREROUTING -t nat -p tcp --dport 443 -j REDIRECT --to-port 8000
   become: yes     
   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Amazon'
