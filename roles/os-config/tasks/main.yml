@@ -99,7 +99,7 @@
   become: yes     
   when: ansible_distribution == "Ubuntu"      
 
-- name: -Ubuntu Updates- Update all packages to the latest version "apt-get upgrade"
+- name: -Ubuntu- Update all packages to the latest version "apt-get upgrade"
   apt:
     name: "*"
     state: latest
@@ -108,9 +108,16 @@
   when: ansible_distribution == "Ubuntu"    
 
 
-- name: -RedHat, CentOS, and Amazon Linux Updates-
+- name: -RedHat, CentOS, and Amazon Linux- Yum OS Package Updates
   yum:
     name: "*"
+    state: latest  
+  become: yes
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
+
+- name: -RedHat, CentOS, and Amazon Linux- Install PolicyKit (supported in 8.1.1)
+  yum:
+    name: polkit
     state: latest  
   become: yes
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
