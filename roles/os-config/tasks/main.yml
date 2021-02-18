@@ -115,7 +115,15 @@
   become: yes
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
 
-- name: -RedHat, CentOS, and Amazon Linux- Install PolicyKit (supported in 8.1.1)
+
+- name: -PolicyKit- Install PolicyKit using apt-get (supported in 8.1.1)
+  apt:
+    name: policykit-1
+    state: latest     
+  become: yes     
+  when: ansible_distribution == "Ubuntu"   
+
+- name: -PolicyKit- Install PolicyKit using yum (supported in 8.1.1)
   yum:
     name: polkit
     state: latest  
