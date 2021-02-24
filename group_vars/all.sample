@@ -183,6 +183,10 @@ splunk_uf_tgz_checksum: 02e4a43e85fa96923e3a6ef652c85ed3
 
 # 7.3.x
 
+# splunk_version: 7.3.9
+# splunk_tgz: splunk-7.3.9-39a78bf1bc5b-Linux-x86_64.tgz
+# splunk_tgz_checksum: 64a4e7977e13b301c6c74444f782f461
+
 # splunk_version: 7.3.8
 # splunk_tgz: splunk-7.3.8-bdc98854fc40-Linux-x86_64.tgz
 # splunk_tgz_checksum: eab5796cfc5916cf1cc3ac28d9e09d9b
@@ -383,9 +387,17 @@ splunk_uf_tgz_checksum: 02e4a43e85fa96923e3a6ef652c85ed3
 
 # 7.3.x
 
+# splunk_uf_version: 7.3.9
+# splunk_uf_tgz: splunkforwarder-7.3.9-39a78bf1bc5b-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: 8a97fb917eda1200f56effa05d910dd8
+
 # splunk_uf_version: 7.3.8
-# splunk_uf_tgz: splunkforwarder-7.3.8-bdc98854fc40-Linux-ppc64le.tgz
-# splunk_uf_tgz_checksum: 4c40578c78036c0581ce73302d79eb1c
+# splunk_uf_tgz: splunkforwarder-7.3.8-bdc98854fc40-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: 1e22dcec172c6a3aed60e82346bb5e11
+
+# splunk_uf_version: 7.3.7.1
+# splunk_uf_tgz: splunkforwarder-7.3.7.1-d3f7cf7c5493-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: a8023dc855411c595ad284e3f9d77937
 
 # splunk_uf_version: 7.3.6
 # splunk_uf_tgz: splunkforwarder-7.3.6-47d8552a4d84-Linux-x86_64.tgz
