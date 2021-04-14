@@ -141,6 +141,10 @@ splunk_uf_tgz_checksum: 80768e388552a4a4f2491388511537a9
 
 # 8.0.x
 
+# splunk_version: 8.0.9
+# splunk_tgz: splunk-8.0.9-153839c8b72f-Linux-x86_64.tgz
+# splunk_tgz_checksum: 8f741ffff675a54724d14536e8f24d2b
+
 # splunk_version: 8.0.8
 # splunk_tgz: splunk-8.0.8-70c2fa5ea15d-Linux-x86_64.tgz
 # splunk_tgz_checksum: 61fff24d7dcd0f0584b89854544e0a9a
@@ -360,6 +364,10 @@ splunk_uf_tgz_checksum: 80768e388552a4a4f2491388511537a9
 # splunk_uf_tgz_checksum: 6a4e99c6287942feb0ad1e6b97a50721
 
 # 8.0.x
+
+# splunk_uf_version: 8.0.9
+# splunk_uf_tgz: splunkforwarder-8.0.9-153839c8b72f-Linux-x86_64.tgz)
+# splunk_uf_tgz_checksum: 9e13044cc2dff39bee3b3c3d2b5b9660
 
 # splunk_uf_version: 8.0.6
 # splunk_uf_tgz: splunkforwarder-8.0.6-152fb4b2bb96-Linux-x86_64.tgz
