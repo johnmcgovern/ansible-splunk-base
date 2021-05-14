@@ -1,8 +1,8 @@
 ---
 
-- name: Create {{ splunk_home }}/etc/auth/my-certs dir
+- name: Create {{ splunk_home }}/etc/auth/mycerts dir
   file:
-    path: "{{ splunk_home }}/etc/auth/my-certs/"
+    path: "{{ splunk_home }}/etc/auth/mycerts/"
     state: directory
     mode: '0755'  
     owner: "{{ os_user }}"
@@ -12,7 +12,7 @@
 - name: -SSL Certs- Upload public key file (certs/cert.pem)
   copy:
     src: "certs/cert.pem"
-    dest: "{{ splunk_home }}/etc/auth/my-certs/cert.pem"
+    dest: "{{ splunk_home }}/etc/auth/mycerts/cert.pem"
     mode: '0640'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
@@ -21,7 +21,7 @@
 - name: -SSL Certs- Upload private key file (certs/privkey.pem)
   copy:
     src: "certs/privkey.pem"
-    dest: "{{ splunk_home }}/etc/auth/my-certs/privkey.pem"
+    dest: "{{ splunk_home }}/etc/auth/mycerts/privkey.pem"
     mode: '0640'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
@@ -46,17 +46,17 @@
 - name: -config updates- Add serverCert attribute to [settings]
   lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
-    regexp: '^serverCert = {{ splunk_home }}/etc/auth/my-certs/cert.pem'
+    regexp: '^serverCert = {{ splunk_home }}/etc/auth/mycerts/cert.pem'
     insertbefore: '^[settings]'
-    line: 'serverCert = {{ splunk_home }}/etc/auth/my-certs/cert.pem'    
+    line: 'serverCert = {{ splunk_home }}/etc/auth/mycerts/cert.pem'    
   become: yes
 
 - name: -config updates- Add privKeyPath attribute to [settings]
   lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
-    regexp: '^privKeyPath = {{ splunk_home }}/etc/auth/my-certs/privkey.pem'
+    regexp: '^privKeyPath = {{ splunk_home }}/etc/auth/mycerts/privkey.pem'
     insertbefore: '^[settings]'
-    line: 'privKeyPath = {{ splunk_home }}/etc/auth/my-certs/privkey.pem'    
+    line: 'privKeyPath = {{ splunk_home }}/etc/auth/mycerts/privkey.pem'    
   become: yes
 
 - name: -config updates- Set enableSplunkWebSSL = 1
