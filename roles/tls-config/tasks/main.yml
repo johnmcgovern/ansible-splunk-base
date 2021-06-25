@@ -9,7 +9,7 @@
     group: "{{ os_group }}"
   become: yes
 
-- name: -SSL Certs- Upload public key file (certs/cert.pem)
+- name: -SSL Certs- Upload public key file (mycerts/cert.pem)
   copy:
     src: "certs/cert.pem"
     dest: "{{ splunk_home }}/etc/auth/mycerts/cert.pem"
@@ -18,7 +18,7 @@
     group: "{{ os_group }}"
   become: yes
 
-- name: -SSL Certs- Upload private key file (certs/privkey.pem)
+- name: -SSL Certs- Upload private key file (mycerts/privkey.pem)
   copy:
     src: "certs/privkey.pem"
     dest: "{{ splunk_home }}/etc/auth/mycerts/privkey.pem"
