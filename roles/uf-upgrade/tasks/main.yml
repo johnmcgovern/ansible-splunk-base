@@ -24,7 +24,7 @@
 
 - name: -TGZ- Download (wget) {{ splunk_uf_tgz }}
   get_url:
-    url: https://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version={{ splunk_uf_version }}&product=universalforwarder&filename={{ splunk_uf_tgz }}&wget=true
+    url: "https://d7wz6hmoaavd0.cloudfront.net/products/splunk/releases/{{ splunk_uf_version }}/linux/{{ splunk_uf_tgz }}"    
     checksum: "md5:{{ splunk_uf_tgz_checksum }}"
     dest: /home/{{ os_user }}
     mode: 0640  
@@ -47,7 +47,7 @@
 - name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to upgrade
   unarchive:
     src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
-    dest: "{{ splunk_uf_home }}/.."
+    dest: "{{ splunk_base_path }}"
     remote_src: yes
     owner: "{{ os_user }}"
     group: "{{ os_group }}"    
