@@ -35,7 +35,7 @@
 
 - name: -TGZ- Download (wget) {{ splunk_uf_tgz }}
   get_url:
-    url: "https://d7wz6hmoaavd0.cloudfront.net/products/splunk/releases/{{ splunk_uf_version }}/linux/{{ splunk_uf_tgz }}"    
+    url: "https://d7wz6hmoaavd0.cloudfront.net/products/universalforwarder/releases/{{ splunk_uf_version }}/linux/{{ splunk_uf_tgz }}"    
     checksum: "md5:{{ splunk_uf_tgz_checksum }}"
     dest: /home/{{ os_user }}
     mode: 0640  
