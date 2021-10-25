@@ -12,7 +12,7 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 2. git clone this project
 
-		- git clone https://github.com/johnmcgovern/ansible-splunk-base.git
+		- git clone https://github.com/h4llm3n/ansible-splunk-base.git
 	
 3. Navigate to project base directory
 
@@ -125,8 +125,3 @@ This role has been tested on:
 ### Warranty
 
 This project is provided WITHOUT any form of warranty and should be tested thoroughly before using it in your environment. Development is best-effort only. This project is provided as-is with no guarantee as to fitness for a specific purpose. Please use it at your own risk.
-
-
-### Contact
-
-- john@johnmcgovern.com or https://www.johnmcgovern.com
