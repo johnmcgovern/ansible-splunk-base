@@ -149,6 +149,10 @@ splunk_uf_tgz_checksum: 417f2b98a103e925bb98503bc71299d3
 
 # 8.1.x
 
+# splunk_version: 8.1.8
+# splunk_tgz: splunk-8.1.8-39da583cc695-Linux-x86_64.tgz
+# splunk_tgz_checksum: ea2f65abc107b061efbd54507422fae0
+
 # splunk_version: 8.1.5
 # splunk_tgz: splunk-8.1.5-9c0c082e4596-Linux-x86_64.tgz
 # splunk_tgz_checksum: 5426ce57ebe9f102ece0d7c1fd09a916
