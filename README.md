@@ -101,14 +101,14 @@ This role has been tested on:
 - Ubuntu 22.04, 20.04, & 18.04 Server (LTS)
 - RHEL 8
 - CentOS 7 1810
-- Amazon Linux 2 2020.04
+- Amazon Linux 2 2022.06 & 2020.04
 
 
 ### Notes
 
 - The goal of this role is to quickly execute a best-practices base Splunk install/upgrade (including support for Workload Management, which is a departure from the previous install method).
 - There are more complex/full-featured projects out there for various deployment topologies. The goal here is simplicity, speed, and utility.
-- 8.1.1 introduced Policy Kit management of systemd processes which allows for splunk to be restarted (for example) as the splunk user or super user using the commnands "splunk restart", "systemctl restart Splunkd", and "sudo systemctl restart Splunkd" for maximum flexibility.
+- 8.1.1 introduced PolicyKit (polkit) management of systemd processes which allows for splunk to be restarted (for example) as the splunk user or super user using the commnands "splunk restart", "systemctl restart Splunkd", and "sudo systemctl restart Splunkd" for maximum flexibility.
 - Both "systemd" and "initd" methods of Linux process management are supported. systemd is ONLY available in Splunk Enterprise version 7.2.2 and later. 
 - Splunk versions 7.2.2 - 7.2.x implement "enable boot-start" differently than 7.3.0 and later. This is now accounted for.
 - Assuming a semi-default install (such as you would find if you installed with this playbook), upgrade.yml will convert from initd process management to systemd process management if you flag "systemd" on install_method.
