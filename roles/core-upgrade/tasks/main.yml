@@ -105,7 +105,18 @@
   become: yes 
   when: 
     - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"    
+    - ansible_distribution == "Ubuntu"   
+
+- name: -systemd & Ubuntu- Fix the cgroups path reference in /etc/systemd/system/Splunkd.service (Ubuntu 22.04)
+  replace:
+    path: /etc/systemd/system/Splunkd.service
+    regexp: '\/sys\/fs\/cgroup\/\w+'
+    replace: '/sys/fs/cgroup'
+  become: yes 
+  when: 
+    - install_method == "systemd"  
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "22"       
 
 - name: -systemd & Ubuntu- After Splunkd.service update reload the systemd daemon units
   command: systemctl daemon-reload
