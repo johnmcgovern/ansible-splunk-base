@@ -64,6 +64,15 @@
     group: "{{ os_group }}"
   become: yes
 
+- name: "Create symlink to splunk in /usr/local/bin"
+  file:
+    src: "{{ splunk_home }}/bin/splunk"
+    path: /usr/local/bin/splunk
+    state: link
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+
 
 - name: -user-seed.conf- Create file for default admin creds
   template:
@@ -111,6 +120,14 @@
     insertafter: '[settings]'
   become: yes
   when: not check_for_updates
+
+- name: -server.conf- Specify the WiredTiger KVstore storage engine in >= 8.1
+  template:
+    src: server.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/server.conf"
+  become: yes 
+  when:
+    - splunk_version is version('8.1', '>=')
 
 - name: Set {{ splunk_home }} owner & group recursively
   file:
@@ -191,6 +208,17 @@
     - install_method == "systemd"  
     - ansible_distribution == "Ubuntu"  
 
+- name: -systemd & Ubuntu- Fix the cgroups path reference in /etc/systemd/system/Splunkd.service (Ubuntu 22.04)
+  replace:
+    path: /etc/systemd/system/Splunkd.service
+    regexp: '\/sys\/fs\/cgroup\/\w+'
+    replace: '/sys/fs/cgroup'
+  become: yes 
+  when: 
+    - install_method == "systemd"  
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version >= "22"  
+
 - name: -systemd & Ubuntu- After Splunkd.service update reload the systemd daemon units
   command: systemctl daemon-reload
   become: yes 
@@ -203,13 +231,3 @@
   become: yes
   when: 
     - install_method == "systemd"
- 
-    
-- name: "Create symlink to splunk in /usr/local/bin"
-  file:
-    src: "{{ splunk_home }}/bin/splunk"
-    path: /usr/local/bin/splunk
-    state: link
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
