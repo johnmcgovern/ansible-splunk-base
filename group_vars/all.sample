@@ -452,6 +452,18 @@ splunk_uf_tgz_checksum: 65a2ad715e831f70bc9bdaea21096c12
 
 # 8.2.x
 
+# splunk_uf_version: 8.2.9
+# splunk_uf_tgz: splunkforwarder-8.2.9-4a20fb65aa78-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: d21495c8e15c0126a030bb3c9adf94a9
+
+# splunk_uf_version: 8.2.8
+# splunk_uf_tgz: splunkforwarder-8.2.8-da25d08d5d3e-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: a10b80f233a525bf5283de8ffea38997
+
+# splunk_uf_version: 8.2.7
+# splunk_uf_tgz: splunkforwarder-8.2.7-2e1fca123028-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: a3b7a7a111f13151392e931cc795361f
+
 # splunk_uf_version: 8.2.6
 # splunk_uf_tgz: splunkforwarder-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz
 # splunk_uf_tgz_checksum: caa7d70e976c0c087312144d83edb3b0
