@@ -86,9 +86,9 @@ uf_forward_internal_logs_port: 9997
 # ===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 9.1.2
-splunk_tgz: splunk-9.1.2-b6b9c8185839-Linux-x86_64.tgz
-splunk_tgz_checksum: aad800b656cef41e16c3819034d1c4f7
+splunk_version: 9.1.3
+splunk_tgz: splunk-9.1.3-d95b3299fa65-Linux-x86_64.tgz
+splunk_tgz_checksum: 3456b7e1ee4d7e885a8a09fc56db872b
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.
@@ -101,9 +101,9 @@ install_method: systemd
 #  Splunk Universal Forwarder Version Selector
 # =============================================
 
-splunk_uf_version: 9.1.2
-splunk_uf_tgz: splunkforwarder-9.1.2-b6b9c8185839-Linux-x86_64.tgz
-splunk_uf_tgz_checksum: 01e64b3631d22db04512af9df3e38b9b
+splunk_uf_version: 9.1.3
+splunk_uf_tgz: splunkforwarder-9.1.3-d95b3299fa65-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: b81667395a7f65cdb39bb83c1cec8aed
 
 
 
@@ -113,6 +113,10 @@ splunk_uf_tgz_checksum: 01e64b3631d22db04512af9df3e38b9b
 # =============================================
 
 # 9.1.x
+
+# splunk_version: 9.1.3
+# splunk_tgz: splunk-9.1.3-d95b3299fa65-Linux-x86_64.tgz
+# splunk_tgz_checksum: 3456b7e1ee4d7e885a8a09fc56db872b
 
 # splunk_version: 9.1.2
 # splunk_tgz: splunk-9.1.2-b6b9c8185839-Linux-x86_64.tgz
@@ -467,6 +471,10 @@ splunk_uf_tgz_checksum: 01e64b3631d22db04512af9df3e38b9b
 # ================================================
 
 # 9.1.x
+
+# splunk_uf_version: 9.1.3
+# splunk_uf_tgz: splunkforwarder-9.1.3-d95b3299fa65-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: b81667395a7f65cdb39bb83c1cec8aed
 
 # splunk_uf_version: 9.1.2
 # splunk_uf_tgz: splunkforwarder-9.1.2-b6b9c8185839-Linux-x86_64.tgz
