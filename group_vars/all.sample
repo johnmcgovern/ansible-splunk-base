@@ -86,9 +86,9 @@ uf_forward_internal_logs_port: 9997
 # ===========================================
 
 # Latest Splunk Enterprise version, filename, checksum, and hashing algorith (for wget pull)
-splunk_version: 9.2.0.1
-splunk_tgz: splunk-9.2.0.1-d8ae995bf219-Linux-x86_64.tgz
-splunk_tgz_checksum: 46e43ddee3476b8b8e929cc131c7bd50
+splunk_version: 9.2.2
+splunk_tgz: splunk-9.2.2-d76edf6f0a15-Linux-x86_64.tgz
+splunk_tgz_checksum: da10ab0199358aa96b3a29420a9d5f4b
 
 # Installation method (pick one): 
 # systemd - 7.2.2 or later required.
@@ -101,9 +101,9 @@ install_method: systemd
 #  Splunk Universal Forwarder Version Selector
 # =============================================
 
-splunk_uf_version: 9.2.0.1
-splunk_uf_tgz: splunkforwarder-9.2.0-1fff88043d5f-Linux-x86_64.tgz
-splunk_uf_tgz_checksum: e8907ec7124530d9d39ecc6ec11d3861
+splunk_uf_version: 9.2.2
+splunk_uf_tgz: splunkforwarder-9.2.2-d76edf6f0a15-Linux-x86_64.tgz
+splunk_uf_tgz_checksum: 0dc08c4508cdd886186eda006793320d
 
 
 
@@ -113,6 +113,14 @@ splunk_uf_tgz_checksum: e8907ec7124530d9d39ecc6ec11d3861
 # =============================================
 
 # 9.2.x
+
+# splunk_version: 9.2.2
+# splunk_tgz: splunk-9.2.2-d76edf6f0a15-Linux-x86_64.tgz
+# splunk_tgz_checksum: da10ab0199358aa96b3a29420a9d5f4b
+
+# splunk_version: 9.2.1
+# splunk_tgz: splunk-9.2.1-78803f08aabb-Linux-x86_64.tgz
+# splunk_tgz_checksum: 1f25058670c915fac35477b3a3a6b384
 
 # splunk_version: 9.2.0.1
 # splunk_tgz: splunk-9.2.0.1-d8ae995bf219-Linux-x86_64.tgz
@@ -477,6 +485,14 @@ splunk_uf_tgz_checksum: e8907ec7124530d9d39ecc6ec11d3861
 # ================================================
 
 # 9.2.x
+
+# splunk_uf_version: 9.2.2
+# splunk_uf_tgz: splunkforwarder-9.2.2-d76edf6f0a15-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: 0dc08c4508cdd886186eda006793320d
+
+# splunk_uf_version: 9.2.1
+# splunk_uf_tgz: splunkforwarder-9.2.1-78803f08aabb-Linux-x86_64.tgz
+# splunk_uf_tgz_checksum: 2ec2cea1ccdc58079d57864c95f05cc7
 
 # splunk_uf_version: 9.2.0.1
 # splunk_uf_tgz: splunkforwarder-9.2.0-1fff88043d5f-Linux-x86_64.tgz
