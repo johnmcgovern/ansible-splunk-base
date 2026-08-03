@@ -9,8 +9,8 @@
   file:
     path: /etc/cloud/cloud-init.disabled
     state: touch
-  become: yes 
-  when: cloud_init_exists == True
+  become: yes
+  when: cloud_init_exists.stat.exists
 
 - name: Set the hostname as per the Ansible inventory file
   hostname:
@@ -88,8 +88,14 @@
 
 
 - name: -iptables- Redirect 443 to 8000 (Ubuntu and Amazon Linux)
-  command: iptables -A PREROUTING -t nat -p tcp --dport 443 -j REDIRECT --to-port 8000
-  become: yes     
+  iptables:
+    table: nat
+    chain: PREROUTING
+    protocol: tcp
+    destination_port: "443"
+    jump: REDIRECT
+    to_ports: "8000"
+  become: yes
   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Amazon'
 
 
@@ -108,24 +114,24 @@
   when: ansible_distribution == "Ubuntu"    
 
 
-- name: -RedHat, CentOS, and Amazon Linux- Yum OS Package Updates
-  yum:
+- name: -RedHat, CentOS, and Amazon Linux- Yum/DNF OS Package Updates
+  package:
     name: "*"
-    state: latest  
+    state: latest
   become: yes
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
 
 
 - name: -PolicyKit- Install PolicyKit using apt-get (supported in 8.1.1)
   apt:
-    name: policykit-1
-    state: latest     
-  become: yes     
-  when: ansible_distribution == "Ubuntu"   
+    name: "{{ 'polkitd' if ansible_distribution_major_version | int >= 24 else 'policykit-1' }}"
+    state: latest
+  become: yes
+  when: ansible_distribution == "Ubuntu"
 
-- name: -PolicyKit- Install PolicyKit using yum (supported in 8.1.1)
-  yum:
+- name: -PolicyKit- Install PolicyKit using yum/dnf (supported in 8.1.1)
+  package:
     name: polkit
-    state: latest  
+    state: latest
   become: yes
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'

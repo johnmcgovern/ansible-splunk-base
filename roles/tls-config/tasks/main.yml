@@ -47,7 +47,7 @@
   lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     regexp: '^serverCert = {{ splunk_home }}/etc/auth/mycerts/cert.pem'
-    insertbefore: '^[settings]'
+    insertafter: '^\[settings\]'
     line: 'serverCert = {{ splunk_home }}/etc/auth/mycerts/cert.pem'    
   become: yes
 
@@ -55,7 +55,7 @@
   lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     regexp: '^privKeyPath = {{ splunk_home }}/etc/auth/mycerts/privkey.pem'
-    insertbefore: '^[settings]'
+    insertafter: '^\[settings\]'
     line: 'privKeyPath = {{ splunk_home }}/etc/auth/mycerts/privkey.pem'    
   become: yes
 

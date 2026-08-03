@@ -117,7 +117,7 @@
   lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     line: updateCheckerBaseURL = 0
-    insertafter: '[settings]'
+    insertafter: '^\[settings\]'
   become: yes
   when: not check_for_updates
 
@@ -152,12 +152,12 @@
     - install_method == "initd" 
     - splunk_version is version('7.2.1', '<=')
 
-- name: -initd & Splunk 7.2 or later- Splunk enable boot-start
+- name: -initd & Splunk 7.2.2 or later- Splunk enable boot-start
   command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 0 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes  
-  when: 
-    - install_method == "initd" 
-    - splunk_version is version('7.2.0', '>=')
+  become: yes
+  when:
+    - install_method == "initd"
+    - splunk_version is version('7.2.2', '>=')
 
 - name: -initd- Start Splunk for the first time
   command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
@@ -182,9 +182,9 @@
     - splunk_version is version('8.1.1', '<')
 
 - name: -systemd & Splunk 8.1.1 polkit- Install "polkit" for 8.1.1 or later on CentOS, RHEL, and Amazon Linux
-  yum:
+  package:
     name: polkit
-    state: latest  
+    state: latest
   become: yes
   when: 
     - install_method == "systemd" 
@@ -217,7 +217,7 @@
   when: 
     - install_method == "systemd"  
     - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version >= "22"  
+    - ansible_distribution_major_version | int >= 22
 
 - name: -systemd & Ubuntu- After Splunkd.service update reload the systemd daemon units
   command: systemctl daemon-reload
