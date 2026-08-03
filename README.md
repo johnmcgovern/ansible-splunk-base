@@ -30,9 +30,39 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 		- cp group_vars/all.sample group_vars/all
 
-7. Edit group_vars/all variables as appropriate for your enviornment
+7. Edit group_vars/all variables as appropriate for your environment
 
 		- vi group_vars/all
+
+
+### Selecting a Splunk Version
+
+Version selection is URL-first: paste the full .tgz download URL for the
+version you want into group_vars/all and everything else (version number,
+filename, sha512 checksum) is derived automatically. Any past or future
+Splunk version works without changes to this project.
+
+1. Find your version on splunk.com and copy the direct download ("wget") link
+   for the Linux .tgz (x86_64/amd64):
+
+		- Splunk Enterprise:   https://www.splunk.com/en_us/download/splunk-enterprise.html
+		- Universal Forwarder: https://www.splunk.com/en_us/download/universal-forwarder.html
+		- Older releases:      https://www.splunk.com/en_us/download/previous-releases.html
+
+2. Set it in group_vars/all:
+
+		- splunk_download_url: https://download.splunk.com/products/splunk/releases/10.4.2/linux/splunk-10.4.2-33c3bf42cd73-linux-amd64.tgz
+		- splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/releases/10.4.2/linux/splunkforwarder-10.4.2-33c3bf42cd73-linux-amd64.tgz
+
+The tgz checksum is verified against the sha512 published alongside it on
+download.splunk.com. To pin a checksum explicitly (e.g. for air-gapped or
+change-controlled environments), set splunk_tgz_checksum / splunk_uf_tgz_checksum
+to `sha512:<hash>`, `sha256:<hash>`, or `md5:<hash>`.
+
+The legacy three-variable form (splunk_version + splunk_tgz +
+splunk_tgz_checksum with a bare md5 hash) from earlier releases of this
+project is still fully supported - see the commented block at the bottom of
+group_vars/all.sample.
 
 
 ### Usage
@@ -89,16 +119,16 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 
 		- ansible-playbook -i hosts --limit=host1 install.yml
 
-14. Run multiple roles in one command
+14. Run multiple playbooks in one command
 
-		- ansible-playbook -i hosts os-config install.yml tls-config.yml
+		- ansible-playbook -i hosts os-config.yml install.yml tls-config.yml
 
 
 ### Compatibility
 
 This role has been tested on:
 
-- Ubuntu 22.04, 20.04, & 18.04 Server (LTS)
+- Ubuntu 26.04, 22.04, 20.04, & 18.04 Server (LTS)
 - RHEL 8
 - CentOS 7 1810
 - Amazon Linux 2 2022.06 & 2020.04
@@ -108,18 +138,17 @@ This role has been tested on:
 
 - The goal of this role is to quickly execute a best-practices base Splunk install/upgrade (including support for Workload Management, which is a departure from the previous install method).
 - There are more complex/full-featured projects out there for various deployment topologies. The goal here is simplicity, speed, and utility.
-- 8.1.1 introduced PolicyKit (polkit) management of systemd processes which allows for splunk to be restarted (for example) as the splunk user or super user using the commnands "splunk restart", "systemctl restart Splunkd", and "sudo systemctl restart Splunkd" for maximum flexibility.
+- 8.1.1 introduced PolicyKit (polkit) management of systemd processes which allows for splunk to be restarted (for example) as the splunk user or super user using the commands "splunk restart", "systemctl restart Splunkd", and "sudo systemctl restart Splunkd" for maximum flexibility.
 - Both "systemd" and "initd" methods of Linux process management are supported. systemd is ONLY available in Splunk Enterprise version 7.2.2 and later. 
 - Splunk versions 7.2.2 - 7.2.x implement "enable boot-start" differently than 7.3.0 and later. This is now accounted for.
 - Assuming a semi-default install (such as you would find if you installed with this playbook), upgrade.yml will convert from initd process management to systemd process management if you flag "systemd" on install_method.
-- A number of config items are set which disable pop-ups and modal dialogues which would normally be shown to the Splunk admin and/or users such as new version available notifications, UI tours, and python 2.7 deprication notifications. The goal here is to generally avoid UI annoyances that would crop up in automatic distributed Splunk deployments.
+- A number of config items are set which disable pop-ups and modal dialogues which would normally be shown to the Splunk admin and/or users such as new version available notifications, UI tours, and python 2.7 deprecation notifications. The goal here is to generally avoid UI annoyances that would crop up in automatic distributed Splunk deployments.
 - This Ansible playbook does not currently handle OS-level firewall allowances for splunkd TCP ports.
 - We bias towards being non-destructive. For example, if we see an existing/previous Splunk install we will fail out rather than damage the current install. 
 
 ### To-Do
 
 - Support for additional server settings.
-- Simplified version/file/hash dictionary.
 
 
 ### Warranty
