@@ -127,3 +127,118 @@
         enabled: true
       become: true
       when: install_method == "systemd"
+
+# Upgrading by extracting the tgz over $SPLUNK_HOME replaces the files the new
+# release ships, but leaves behind any file the new release dropped - old
+# python, mongod and library versions. Splunk's own file integrity check then
+# reports them as "present_but_shouldnt_be" on every startup.
+#
+# These tasks run outside the block above so an already-upgraded host can be
+# tidied without re-running the upgrade itself.
+#
+# INVARIANT: the deletion list is derived FROM THE PREVIOUS RELEASE'S MANIFEST,
+# never from the contents of the filesystem. A file is removed only when all
+# three hold: a previous release's manifest listed it, the current release's
+# manifest does not, and it is still on disk. Anything absent from both
+# manifests - indexes, var/, the KV store, etc/*/local, licence state - can
+# therefore never be selected. Do not invert this into "remove what is on disk
+# but not in the manifest": Splunk keeps many unmanifested files it needs, and
+# deleting them breaks the install.
+#
+# Removal is scoped to the top level of bin/ and lib/, matching what Splunk's
+# integrity check reports. Run with --check first to list what would go.
+- name: Remove files left behind by a previous Splunk release
+  when: splunk_remove_stale_files | default(false) | bool
+  block:
+
+    - name: -stale files- Find Splunk manifests in {{ splunk_home }}
+      ansible.builtin.find:
+        paths: "{{ splunk_home }}"
+        patterns: "splunk-*-manifest"
+        file_type: file
+      register: splunk_manifests
+      become: true
+
+    - name: -stale files- Identify the current and superseded manifests
+      ansible.builtin.set_fact:
+        splunk_current_manifest: "{{ splunk_manifest_name }}"
+        splunk_superseded_manifests: >-
+          {{ splunk_manifests.files | map(attribute='path')
+             | reject('equalto', splunk_manifest_name) | list }}
+      vars:
+        splunk_manifest_name: "{{ splunk_home }}/{{ splunk_tgz | regex_replace('\\.tgz$', '') }}-manifest"
+
+    - name: Clean up against the superseded manifests
+      when: splunk_superseded_manifests | length > 0
+      block:
+
+        - name: -stale files- List files the previous release shipped and this one does not
+          ansible.builtin.shell:
+            # LC_ALL=C matters: comm compares byte-wise and silently emits
+            # garbage if sort used a locale-dependent collation.
+            cmd: |
+              set -o pipefail
+              export LC_ALL=C
+              work=$(mktemp -d)
+              trap 'rm -rf "$work"' EXIT
+              paths() { awk '$1 == "f" || $1 == "l" {print $5}' "$@"; }
+              paths {{ splunk_current_manifest | quote }} | sort -u > "$work/current"
+              paths {{ splunk_superseded_manifests | map('quote') | join(' ') }} | sort -u > "$work/previous"
+              comm -23 "$work/previous" "$work/current" > "$work/dropped"
+              # Scoped to the top level of bin/ and lib/, which is what Splunk's
+              # own integrity check reports. Stale files do exist deeper in the
+              # tree (bin/jars, lib/python3.x, retired apps); widen this pattern
+              # to reclaim those too, at the cost of a much larger deletion.
+              grep -E '^[^/]+/(bin|lib)/[^/]+$' "$work/dropped" > "$work/scoped" || true
+              while read -r relative; do
+                  path="{{ splunk_home }}/${relative#*/}"
+                  if [ -e "$path" ] || [ -L "$path" ]; then
+                      printf '%s\n' "$path"
+                  fi
+              done < "$work/scoped"
+            executable: /bin/bash
+          register: splunk_stale_files
+          changed_when: false
+          # Read-only, so run it under --check too - otherwise a dry run cannot
+          # show which files would be removed.
+          check_mode: false
+          become: true
+
+        - name: -stale files- Report how many files will be removed
+          ansible.builtin.debug:
+            msg: >-
+              {{ splunk_stale_files.stdout_lines | length }} file(s) shipped by a
+              previous Splunk release will be removed from {{ splunk_home }}.
+
+        # Removed in bulk rather than with a file/state=absent loop: there are
+        # typically thousands of them and a per-file task takes many minutes.
+        - name: -stale files- Remove them
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail
+              printf '%s\n' {{ splunk_stale_files.stdout_lines | map('quote') | join(' ') }} |
+                  xargs -r -d '\n' rm -f --
+            executable: /bin/bash
+          become: true
+          when: splunk_stale_files.stdout_lines | length > 0
+          changed_when: true
+          notify: restart splunk
+
+        # Fail loudly rather than leaving a damaged install behind: this is
+        # Splunk's own check that every file the current manifest requires is
+        # present and unmodified.
+        - name: -stale files- Verify the install still matches the current manifest
+          ansible.builtin.command: "{{ splunk_home }}/bin/splunk validate files"
+          register: splunk_validate_files
+          changed_when: false
+          failed_when: "'All installed files intact' not in splunk_validate_files.stdout"
+          become: true
+          when: splunk_stale_files.stdout_lines | length > 0
+
+        - name: -stale files- Remove the superseded manifests themselves
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          become: true
+          loop: "{{ splunk_superseded_manifests }}"
+          notify: restart splunk

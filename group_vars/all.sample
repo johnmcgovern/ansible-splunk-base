@@ -74,6 +74,21 @@ check_for_updates: true
 # An empty list (the default) leaves the setting unmanaged.
 splunk_email_allowed_domains: []
 
+# Remove files that a previous Splunk release shipped and the current release
+# no longer ships (old python, mongod and library versions). Extracting the tgz
+# over $SPLUNK_HOME cannot remove them, so Splunk's file integrity check reports
+# them as "present_but_shouldnt_be" after every upgrade.
+#
+# A file is removed only when the previous release's manifest lists it, the
+# current release's manifest does not, and it is still on disk - so files that
+# Splunk never shipped are never touched. Removal is scoped to the top level of
+# bin/ and lib/, which is what Splunk's own check reports.
+#
+# Defaults to false because it deletes files under $SPLUNK_HOME. Set it to true
+# to have upgrade.yml tidy up; it also cleans a host that is already at the
+# target version. Run upgrade.yml with --check first to list what would go.
+splunk_remove_stale_files: false
+
 
 #
 # Universal Forwarder Configuration Settings
