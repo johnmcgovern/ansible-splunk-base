@@ -1,5 +1,14 @@
 
+# Splunk Enterprise (Core) hosts.
+# Targeted by install.yml, upgrade.yml, os-config.yml, combo.yml,
+# tls-config.yml, backup-etc.yml and backup-full.yml.
 [splunkhosts]
 my-host.splk.me ansible_host=172.16.1.1
 
- 
+# Universal Forwarder hosts.
+# Targeted by uf-install.yml, uf-config.yml, uf-combo.yml and uf-upgrade.yml.
+#
+# Keeping them in their own group is what stops a UF playbook from installing a
+# forwarder onto an indexer or search head.
+[ufhosts]
+my-forwarder.splk.me ansible_host=172.16.1.2

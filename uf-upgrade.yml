@@ -2,12 +2,12 @@
 # This playbook upgrades the Splunk Universal Forwarder
 
 - name: Apply prereqs to all nodes
-  hosts: all
+  hosts: "{{ splunk_uf_hosts | default('ufhosts') }}"
   gather_facts: false
   roles:
     - prereqs
 
 - name: Upgrade Splunk Universal Forwarder
-  hosts: all
+  hosts: "{{ splunk_uf_hosts | default('ufhosts') }}"
   roles:
     - uf-upgrade

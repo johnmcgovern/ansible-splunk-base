@@ -137,6 +137,38 @@ group_vars/all.sample.
 		- ansible-playbook -i hosts os-config.yml install.yml tls-config.yml
 
 
+### Which Hosts a Playbook Targets
+
+Splunk Enterprise and Universal Forwarder playbooks target separate inventory
+groups, so a UF playbook cannot install a forwarder onto an indexer or search
+head:
+
+| Playbooks | Default group |
+| --- | --- |
+| install, upgrade, os-config, combo, tls-config, backup-etc, backup-full | `splunkhosts` |
+| uf-install, uf-config, uf-combo, uf-upgrade | `ufhosts` |
+
+Define both groups in your hosts file - see hosts.sample.
+
+To target something else, pass splunk_hosts or splunk_uf_hosts as an extra
+variable. Any inventory pattern works: a group, a host, or a comma-separated
+list.
+
+		- ansible-playbook -i hosts install.yml -e splunk_hosts=all
+		- ansible-playbook -i hosts install.yml -e splunk_hosts=indexers
+		- ansible-playbook -i hosts uf-install.yml -e splunk_uf_hosts=my-forwarder.splk.me
+
+These two must be passed with -e. Setting them in group_vars has no effect,
+because Ansible resolves which hosts a play targets before it loads the
+variables belonging to those hosts.
+
+Earlier releases targeted "all" from every playbook. If you relied on that,
+"-e splunk_hosts=all" reproduces it, or you can rename your inventory group to
+splunkhosts.
+
+"--limit" still works as always, and narrows whatever the playbook targets.
+
+
 ### Protecting the Splunk Credentials
 
 group_vars/all holds splunk_pass and splunk_uf_pass in plain text. To encrypt

@@ -2,12 +2,12 @@
 # This playbook deploys a basic Splunk Universal Forwarder installation
 
 - name: Apply prereqs to all nodes
-  hosts: all
+  hosts: "{{ splunk_uf_hosts | default('ufhosts') }}"
   gather_facts: false
   roles:
     - prereqs
 
 - name: Install Splunk Universal Forwarder
-  hosts: all
+  hosts: "{{ splunk_uf_hosts | default('ufhosts') }}"
   roles:
     - uf-install

@@ -2,6 +2,6 @@
 # This playbook upgrades a basic Splunk Enteprise (Core) installation
 
 - name: Upgrade Splunk
-  hosts: all
+  hosts: "{{ splunk_hosts | default('splunkhosts') }}"
   roles:
     - core-upgrade

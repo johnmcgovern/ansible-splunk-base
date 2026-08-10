@@ -23,6 +23,13 @@
 # ============================================================
 #  Connection
 # ============================================================
+#
+# Note on which hosts a playbook targets: the Splunk Enterprise playbooks
+# default to the "splunkhosts" inventory group and the Universal Forwarder
+# playbooks to "ufhosts", so a UF playbook cannot install a forwarder onto an
+# indexer. Override with "-e splunk_hosts=..." or "-e splunk_uf_hosts=...".
+# Those two cannot be set here: Ansible resolves which hosts a play targets
+# before it loads the variables belonging to those hosts.
 
 # Remote host username, password, sudo password, and SSH private key.
 # Comment out whichever your authentication method does not need.

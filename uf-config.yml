@@ -4,12 +4,12 @@
 #  2) Forward _internal logs to the indexer tier.
 
 - name: Apply prereqs to all nodes
-  hosts: all
+  hosts: "{{ splunk_uf_hosts | default('ufhosts') }}"
   gather_facts: false
   roles:
     - prereqs
 
 - name: Configure Splunk Universal Forwarder
-  hosts: all
+  hosts: "{{ splunk_uf_hosts | default('ufhosts') }}"
   roles:
     - uf-config

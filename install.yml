@@ -2,12 +2,12 @@
 # This playbook deploys a basic Splunk Enterprise (Core) installation
 
 - name: Apply prereqs to all nodes
-  hosts: all
+  hosts: "{{ splunk_hosts | default('splunkhosts') }}"
   gather_facts: false
   roles:
     - prereqs
 
 - name: Install Splunk
-  hosts: all
+  hosts: "{{ splunk_hosts | default('splunkhosts') }}"
   roles:
     - core-install

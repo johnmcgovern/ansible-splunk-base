@@ -2,12 +2,12 @@
 # This playbook performs basic OS level config
 
 - name: Apply prereqs to all nodes
-  hosts: all
+  hosts: "{{ splunk_hosts | default('splunkhosts') }}"
   gather_facts: false
   roles:
     - prereqs
 
 - name: Basic OS Configuration & Updates
-  hosts: all
+  hosts: "{{ splunk_hosts | default('splunkhosts') }}"
   roles:
     - os-config

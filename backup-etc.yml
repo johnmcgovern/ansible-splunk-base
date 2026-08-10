@@ -2,6 +2,6 @@
 # This playbook backs up Splunk configuration in $SPLUNK_HOME/etc/ to $HOME_PATH/backups/
 
 - name: Backup Splunk configuration
-  hosts: all
+  hosts: "{{ splunk_hosts | default('splunkhosts') }}"
   roles:
     - backup-etc
