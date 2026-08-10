@@ -2,9 +2,11 @@
 # Update every OS package to the latest version (apt dist-upgrade / dnf
 # update) as part of os-config.
 #
-# Defaults to true because that is what this playbook has always done, and
-# the lab-provisioning use case it was written for expects it. Set it to false
-# when you want os-config to configure the OS for Splunk without also patching
-# the whole host - for example when patching is managed elsewhere, or when you
-# do not want an unplanned kernel upgrade on a production box.
-os_update_packages: true
+# Opt-in. Patching a whole host - which can pull in a new kernel - is a large
+# and surprising side effect for a playbook that otherwise just configures the
+# OS for Splunk, and it is the kind of thing that should be a deliberate
+# choice rather than something a config run does on the way past.
+#
+# Set it to true to restore the behaviour of releases before this one, where
+# os-config always ran a full dist-upgrade.
+os_update_packages: false

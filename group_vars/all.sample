@@ -93,9 +93,9 @@ splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/
 # uf_install_method: initd
 
 # Update every OS package as part of os-config (apt dist-upgrade, or dnf
-# update on RedHat-family hosts). True is what os-config has always done; set
-# it to false to configure the OS for Splunk without also patching the host.
-# os_update_packages: true
+# update on RedHat-family hosts). Opt-in: releases before this one always
+# patched the host. Set it to true to get that behaviour back.
+# os_update_packages: false
 
 # Upload the installer from this project's files/ directory instead of
 # downloading it from Splunk (for air-gapped environments).
