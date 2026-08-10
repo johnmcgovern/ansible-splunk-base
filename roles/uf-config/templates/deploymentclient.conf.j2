@@ -1,0 +1,9 @@
+#
+# Deployment server connection
+# https://docs.splunk.com/Documentation/Splunk/latest/Updating/Configuredeploymentclients
+#
+
+[deployment-client]
+
+[target-broker:deploymentServer]
+targetUri = {{ uf_deploy_server_address }}:{{ uf_deploy_server_port }}

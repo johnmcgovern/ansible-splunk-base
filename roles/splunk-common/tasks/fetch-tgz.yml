@@ -1,0 +1,43 @@
+---
+# Shared tgz fetch used by the core and UF install/upgrade roles.
+#
+# Downloads the installer from Splunk, or uploads it from the project's
+# ./files/ directory, unless it is already present on the remote host.
+#
+# Callers pass:
+#   splunk_fetch_tgz       - installer filename
+#   splunk_fetch_url       - full download URL
+#   splunk_fetch_checksum  - "<algorithm>:<hash|url>", or "" to skip verification
+#   splunk_fetch_download  - true to download from Splunk, false to upload from ./files/
+
+- name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_fetch_tgz }}
+  stat:
+    path: /home/{{ os_user }}/{{ splunk_fetch_tgz }}
+  register: splunk_fetch_tgz_stat
+  become: yes
+
+- name: -TGZ- Download {{ splunk_fetch_tgz }} from Splunk
+  get_url:
+    url: "{{ splunk_fetch_url }}"
+    checksum: "{{ splunk_fetch_checksum | default('') }}"
+    dest: /home/{{ os_user }}/{{ splunk_fetch_tgz }}
+    mode: '0640'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    timeout: 60
+  become: yes
+  when:
+    - not splunk_fetch_tgz_stat.stat.exists
+    - splunk_fetch_download | bool
+
+- name: -TGZ- Upload ./files/{{ splunk_fetch_tgz }} (local) to /home/{{ os_user }}/ (remote)
+  copy:
+    src: "{{ playbook_dir }}/files/{{ splunk_fetch_tgz }}"
+    dest: /home/{{ os_user }}/{{ splunk_fetch_tgz }}
+    mode: '0640'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: yes
+  when:
+    - not splunk_fetch_tgz_stat.stat.exists
+    - not (splunk_fetch_download | bool)

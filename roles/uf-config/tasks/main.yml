@@ -4,12 +4,21 @@
   template:
     src: outputs.conf.j2
     dest: "{{ splunk_uf_home }}/etc/system/local/outputs.conf"
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0644'
   become: yes
+  notify: restart splunk uf
 
+# Equivalent to "splunk set deploy-poll <host>:<port>", but idempotent and
+# without passing admin credentials on the command line (where they would be
+# visible in the process list and in Ansible output).
 - name: -DS- Set the deployment server name or IP
-  command: "{{ splunk_uf_home }}/bin/splunk set deploy-poll {{ uf_deploy_server_address }}:{{ uf_deploy_server_port }} -auth {{ splunk_uf_user }}:{{ splunk_uf_pass }}"
-  become: yes  
-
-- name: -initd- Restart Splunk UF
-  command: "{{ splunk_uf_home }}/bin/splunk restart"
-  become: yes  
+  template:
+    src: deploymentclient.conf.j2
+    dest: "{{ splunk_uf_home }}/etc/system/local/deploymentclient.conf"
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0644'
+  become: yes
+  notify: restart splunk uf

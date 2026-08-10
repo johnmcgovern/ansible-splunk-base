@@ -3,8 +3,8 @@
 - name: Add "{{ os_group }}" group
   group:
     name: "{{ os_group }}"
-    state: present  
-  become: yes  
+    state: present
+  become: yes
 
 - name: Add "{{ os_user }}" user with the home dir /home/{{ os_user }}/
   user:
@@ -19,42 +19,24 @@
   file:
     path: "{{ splunk_home }}"
     state: directory
-    mode: '0755'  
+    mode: '0755'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
 
 
-- name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_tgz }}
-  stat: 
-    path: /home/{{ os_user }}/{{ splunk_tgz }}
-    get_checksum: yes  
-    checksum_algorithm: md5
-  register: splunk_tgz_downloaded_flag
-  become: yes
+- name: -TGZ- Fetch the Splunk installer
+  include_role:
+    name: splunk-common
+    tasks_from: fetch-tgz
+  vars:
+    splunk_fetch_tgz: "{{ splunk_tgz }}"
+    splunk_fetch_url: "{{ splunk_tgz_url }}"
+    splunk_fetch_checksum: "{{ splunk_tgz_checksum_resolved | default('') }}"
+    splunk_fetch_download: "{{ download_tgz_from_splunk_servers }}"
 
-- name: -TGZ- Download (wget) {{ splunk_tgz }}
-  get_url:
-    url: "{{ splunk_tgz_url }}"
-    checksum: "{{ splunk_tgz_checksum_resolved | default(omit) }}"
-    dest: /home/{{ os_user }}
-    mode: '0640'  
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-    timeout: 20
-  become: yes
-  when: splunk_tgz_downloaded_flag.stat.exists == False and download_tgz_from_splunk_servers 
-
-- name: -TGZ- Upload ./files/{{ splunk_tgz }} (local) to /home/{{ os_user }}/ (remote)
-  copy:
-    src: "files/{{ splunk_tgz }}"
-    dest: /home/{{ os_user }}
-    mode: '0640'
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
-  when: splunk_tgz_downloaded_flag.stat.exists == False and not download_tgz_from_splunk_servers  
-
+# "creates" keeps us non-destructive: an existing install is never extracted
+# over, and re-running install.yml against an installed host is a no-op.
 - name: -TGZ- Extract {{ splunk_tgz }} to {{ splunk_home }} to install
   unarchive:
     src: /home/{{ os_user }}/{{ splunk_tgz }}
@@ -62,6 +44,8 @@
     remote_src: yes
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
+    creates: "{{ splunk_home }}/bin/splunk"
+  register: splunk_extracted
   become: yes
 
 - name: "Create symlink to splunk in /usr/local/bin"
@@ -74,11 +58,19 @@
   become: yes
 
 
+# Splunk consumes and deletes user-seed.conf on first start. It is written
+# only for a fresh install so that re-running this role never resets the
+# admin password on an existing instance.
 - name: -user-seed.conf- Create file for default admin creds
   template:
     src: user-seed.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/user-seed.conf"
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0600'
   become: yes
+  no_log: yes
+  when: splunk_extracted is changed
 
 - name: "-.ui_login- Touch {{ splunk_home }}/etc/.ui_login"
   file:
@@ -87,31 +79,50 @@
     mode: '0644'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes   
+    access_time: preserve
+    modification_time: preserve
+  become: yes
 
 - name: -user-prefs.conf- Create file for default user/UI preferences
   template:
     src: user-prefs.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/user-prefs.conf"
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0644'
   become: yes
+  notify: restart splunk
 
 - name: -ui-tour.conf- Create file to disable default search tour
   template:
     src: ui-tour.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/ui-tour.conf"
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0644'
   become: yes
+  notify: restart splunk
 
 - name: -limits.conf- Set reasonable saved search limits (increased) for ES
   template:
     src: limits.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/limits.conf"
-  become: yes 
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0644'
+  become: yes
+  notify: restart splunk
 
 - name: -web.conf- Create file to disable SSL and set up file for additional adds
   template:
     src: web.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/web.conf"
-  become: yes 
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0600'
+    force: no
+  become: yes
+  notify: restart splunk
 
 - name: -web.conf- Disable auto update checking
   lineinfile:
@@ -120,14 +131,20 @@
     insertafter: '^\[settings\]'
   become: yes
   when: not check_for_updates
+  notify: restart splunk
 
 - name: -server.conf- Specify the WiredTiger KVstore storage engine in >= 8.1
   template:
     src: server.conf.j2
     dest: "{{ splunk_home }}/etc/system/local/server.conf"
-  become: yes 
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0644'
+    force: no
+  become: yes
   when:
     - splunk_version is version('8.1', '>=')
+  notify: restart splunk
 
 - name: Set {{ splunk_home }} owner & group recursively
   file:
@@ -136,48 +153,53 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     recurse: yes
-  become: yes  
+  become: yes
+  when: splunk_extracted is changed
 
 - name: Ensure default Splunk systemd unit file does not already exist
   file:
     path: /etc/systemd/system/Splunkd.service
     state: absent
   become: yes
+  when: splunk_extracted is changed
 
 
 - name: -initd & Splunk 7.2.1 or earlier- Splunk enable boot-start
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes  
-  when: 
-    - install_method == "initd" 
+  command:
+    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+    creates: /etc/init.d/splunk
+  become: yes
+  when:
+    - install_method == "initd"
     - splunk_version is version('7.2.1', '<=')
 
 - name: -initd & Splunk 7.2.2 or later- Splunk enable boot-start
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 0 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+  command:
+    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 0 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+    creates: /etc/init.d/splunk
   become: yes
   when:
     - install_method == "initd"
     - splunk_version is version('7.2.2', '>=')
 
-- name: -initd- Start Splunk for the first time
-  command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-  become: yes  
-  when: install_method == "initd"
-
 
 - name: -systemd & Splunk 7.2.2 to 7.2.x- Splunk enable boot-start (no systemd arguments added)
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes  
+  command:
+    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+    creates: /etc/systemd/system/Splunkd.service
+  become: yes
   when:
-    - install_method == "systemd" 
+    - install_method == "systemd"
     - splunk_version is version('7.2.2', '>=')
     - splunk_version is version('7.3', '<')
 
 - name: -systemd & Splunk 7.3 to 8.1.0- Splunk enable boot-start (-systemd-managed 1)
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes 
+  command:
+    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+    creates: /etc/systemd/system/Splunkd.service
+  become: yes
   when:
-    - install_method == "systemd" 
+    - install_method == "systemd"
     - splunk_version is version('7.3', '>=')
     - splunk_version is version('8.1.1', '<')
 
@@ -186,48 +208,51 @@
     name: polkit
     state: latest
   become: yes
-  when: 
-    - install_method == "systemd" 
+  when:
+    - install_method == "systemd"
     - splunk_version is version('8.1.1', '>=')
-    - ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'  
+    - ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
 
 - name: -systemd & Splunk 8.1.1 or later- Splunk enable boot-start (-systemd-managed 1) (-create-polkit-rules 1)
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes 
+  command:
+    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+    creates: /etc/systemd/system/Splunkd.service
+  become: yes
   when:
-    - install_method == "systemd" 
+    - install_method == "systemd"
     - splunk_version is version('8.1.1', '>=')
 
-- name: -systemd & Ubuntu- Fix the /etc/systemd/system/Splunkd.service file for Ubuntu support
-  replace:
-    path: /etc/systemd/system/Splunkd.service
-    regexp: '\/init.scope'
-    replace: ''
-  become: yes 
-  when: 
-    - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"  
+- name: -systemd- Apply Splunkd.service fixes
+  include_role:
+    name: splunk-common
+    tasks_from: systemd-unit-fixes
+  when: install_method == "systemd"
 
-- name: -systemd & Ubuntu- Fix the cgroups path reference in /etc/systemd/system/Splunkd.service (Ubuntu 22.04)
-  replace:
-    path: /etc/systemd/system/Splunkd.service
-    regexp: '\/sys\/fs\/cgroup\/\w+'
-    replace: '/sys/fs/cgroup'
-  become: yes 
-  when: 
-    - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version | int >= 22
 
-- name: -systemd & Ubuntu- After Splunkd.service update reload the systemd daemon units
-  command: systemctl daemon-reload
-  become: yes 
-  when: 
-    - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"    
+# Run any pending config-change restart now, so the "is it running" checks
+# below settle the service state instead of leaving a restart for later.
+- name: Flush handlers before verifying that Splunk is running
+  meta: flush_handlers
 
-- name: -systemd- Start Splunk for the first time
-  command: "systemctl start Splunkd"
+- name: -systemd- Ensure Splunk is running
+  systemd:
+    name: Splunkd
+    state: started
+    enabled: yes
   become: yes
-  when: 
-    - install_method == "systemd"
+  when: install_method == "systemd"
+
+- name: -initd- Check whether Splunk is already running
+  command: "{{ splunk_home }}/bin/splunk status"
+  register: splunk_status
+  changed_when: false
+  failed_when: false
+  become: yes
+  when: install_method == "initd"
+
+- name: -initd- Start Splunk
+  command: "{{ splunk_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: yes
+  when:
+    - install_method == "initd"
+    - "'is running' not in splunk_status.stdout | default('')"

@@ -3,8 +3,8 @@
 - name: Add {{ os_group }} group
   group:
     name: "{{ os_group }}"
-    state: present  
-  become: yes  
+    state: present
+  become: yes
 
 - name: Add {{ os_user }} user
   user:
@@ -19,57 +19,49 @@
   file:
     path: "{{ splunk_uf_home }}"
     state: directory
-    mode: 0755  
+    mode: '0755'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
   become: yes
 
 
-- name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_uf_tgz }}
-  stat: 
-    path: /home/{{ os_user }}/{{ splunk_uf_tgz }}
-    get_checksum: yes  
-    checksum_algorithm: md5
-  register: splunk_uf_tgz_downloaded_flag
-  become: yes
+- name: -TGZ- Fetch the Splunk Universal Forwarder installer
+  include_role:
+    name: splunk-common
+    tasks_from: fetch-tgz
+  vars:
+    splunk_fetch_tgz: "{{ splunk_uf_tgz }}"
+    splunk_fetch_url: "{{ splunk_uf_tgz_url }}"
+    splunk_fetch_checksum: "{{ splunk_uf_tgz_checksum_resolved | default('') }}"
+    splunk_fetch_download: "{{ download_uf_tgz_from_splunk_servers }}"
 
-- name: -TGZ- Download (wget) {{ splunk_uf_tgz }}
-  get_url:
-    url: "{{ splunk_uf_tgz_url }}"
-    checksum: "{{ splunk_uf_tgz_checksum_resolved | default(omit) }}"
-    dest: /home/{{ os_user }}
-    mode: 0640  
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-    timeout: 20
-  become: yes
-  when: splunk_uf_tgz_downloaded_flag.stat.exists == False and download_uf_tgz_from_splunk_servers
-
-- name: -TGZ- Upload ./files/{{ splunk_uf_tgz }} (local) to /home/{{ os_user }}/ (remote)
-  copy:
-    src: "files/{{ splunk_uf_tgz }}"
-    dest: /home/{{ os_user }}
-    mode: '0640'
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
-  when: splunk_uf_tgz_downloaded_flag.stat.exists == False and not download_uf_tgz_from_splunk_servers  
-
+# "creates" keeps us non-destructive: an existing install is never extracted
+# over, and re-running uf-install.yml against an installed host is a no-op.
 - name: -TGZ- Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to install
   unarchive:
     src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
     dest: "{{ splunk_base_path }}"
     remote_src: yes
     owner: "{{ os_user }}"
-    group: "{{ os_group }}"    
+    group: "{{ os_group }}"
+    creates: "{{ splunk_uf_home }}/bin/splunk"
+  register: splunk_uf_extracted
   become: yes
 
 
+# Splunk consumes and deletes user-seed.conf on first start. It is written
+# only for a fresh install so that re-running this role never resets the
+# admin password on an existing forwarder.
 - name: Create user-seed.conf file for default admin creds
   template:
     src: user-seed.conf.j2
     dest: "{{ splunk_uf_home }}/etc/system/local/user-seed.conf"
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    mode: '0600'
   become: yes
+  no_log: yes
+  when: splunk_uf_extracted is changed
 
 - name: Set {{ splunk_uf_home }} owner & group recursively
   file:
@@ -78,18 +70,28 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     recurse: yes
-  become: yes  
+  become: yes
+  when: splunk_uf_extracted is changed
 
 
 - name: -initd- Splunk enable boot-start
   command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes 
+  become: yes
+  when: splunk_uf_extracted is changed
 
-- name: -initd- Start Splunk UF for the first time
+- name: Check whether the Universal Forwarder is already running
+  command: "{{ splunk_uf_home }}/bin/splunk status"
+  register: splunk_uf_status
+  changed_when: false
+  failed_when: false
+  become: yes
+
+- name: Start the Splunk Universal Forwarder
   command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-  become: yes    
+  become: yes
+  when: "'is running' not in splunk_uf_status.stdout"
 
-  
+
 - name: "Create symlink to splunk in /usr/local/bin"
   file:
     src: "{{ splunk_uf_home }}/bin/splunk"

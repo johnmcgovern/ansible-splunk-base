@@ -1,82 +1,89 @@
 ---
 
-- name: Ensure {{ splunk_uf_home }} dir exists
-  file:
-    path: "{{ splunk_uf_home }}"
-    state: directory
-    mode: 0755  
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
+- name: Check for an existing Universal Forwarder install
+  stat:
+    path: "{{ splunk_uf_home }}/etc/splunk.version"
+  register: splunk_uf_version_file_stat
   become: yes
 
-- name: -initd- Stop the UF
-  command: "{{ splunk_uf_home }}/bin/splunk stop"
-  become: yes  
-
-
-- name: Check for the presence of /home/{{ os_user }}/{{ splunk_uf_tgz }}
-  stat: 
-    path: /home/{{ os_user }}/{{ splunk_uf_tgz }}
-    get_checksum: yes  
-    checksum_algorithm: md5
-  register: splunk_uf_tgz_downloaded_flag
+- name: Read the currently installed Universal Forwarder version
+  slurp:
+    src: "{{ splunk_uf_home }}/etc/splunk.version"
+  register: splunk_uf_version_file
   become: yes
+  when: splunk_uf_version_file_stat.stat.exists
 
-- name: -TGZ- Download (wget) {{ splunk_uf_tgz }}
-  get_url:
-    url: "{{ splunk_uf_tgz_url }}"
-    checksum: "{{ splunk_uf_tgz_checksum_resolved | default(omit) }}"
-    dest: /home/{{ os_user }}
-    mode: 0640  
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-    timeout: 20
-  become: yes
-  when: splunk_uf_tgz_downloaded_flag.stat.exists == False and download_uf_tgz_from_splunk_servers
+- name: Record the currently installed Universal Forwarder version
+  set_fact:
+    splunk_uf_installed_version: >-
+      {{ (splunk_uf_version_file.content | b64decode | regex_search('VERSION=([0-9.]+)', '\1') | first)
+         if splunk_uf_version_file_stat.stat.exists else 'none' }}
 
-- name: -TGZ- Upload ./files/{{ splunk_uf_tgz }} (local) to /home/{{ os_user }}/ (remote)
-  copy:
-    src: "files/{{ splunk_uf_tgz }}"
-    dest: /home/{{ os_user }}
-    mode: '0640'
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
-  when: splunk_uf_tgz_downloaded_flag.stat.exists == False and not download_uf_tgz_from_splunk_servers   
-
-- name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to upgrade
-  unarchive:
-    src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
-    dest: "{{ splunk_base_path }}"
-    remote_src: yes
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"    
-  become: yes
-
-- name: Set {{ splunk_uf_home }} owner & group recursively
-  file:
-    path: "{{ splunk_uf_home }}"
-    state: directory
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-    recurse: yes
-  become: yes  
+- name: Report that the Universal Forwarder is already at the target version
+  debug:
+    msg: "Splunk Universal Forwarder {{ splunk_uf_version }} is already installed at {{ splunk_uf_home }} - nothing to upgrade."
+  when: splunk_uf_installed_version == splunk_uf_version
 
 
-- name: -initd- Splunk enable boot-start
-  command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes 
+- name: Upgrade the Universal Forwarder from {{ splunk_uf_installed_version }} to {{ splunk_uf_version }}
+  when: splunk_uf_installed_version != splunk_uf_version
+  block:
 
-- name: -initd- Start Splunk UF for the first time
-  command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-  become: yes    
+    - name: Ensure {{ splunk_uf_home }} dir exists
+      file:
+        path: "{{ splunk_uf_home }}"
+        state: directory
+        mode: '0755'
+        owner: "{{ os_user }}"
+        group: "{{ os_group }}"
+      become: yes
 
-  
-- name: "Create symlink to splunk in /usr/local/bin"
-  file:
-    src: "{{ splunk_uf_home }}/bin/splunk"
-    path: /usr/local/bin/splunk
-    state: link
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
+    - name: -TGZ- Fetch the Splunk Universal Forwarder installer
+      include_role:
+        name: splunk-common
+        tasks_from: fetch-tgz
+      vars:
+        splunk_fetch_tgz: "{{ splunk_uf_tgz }}"
+        splunk_fetch_url: "{{ splunk_uf_tgz_url }}"
+        splunk_fetch_checksum: "{{ splunk_uf_tgz_checksum_resolved | default('') }}"
+        splunk_fetch_download: "{{ download_uf_tgz_from_splunk_servers }}"
+
+    - name: -initd- Stop the UF
+      command: "{{ splunk_uf_home }}/bin/splunk stop"
+      become: yes
+      when: splunk_uf_version_file_stat.stat.exists
+
+    - name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to upgrade
+      unarchive:
+        src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
+        dest: "{{ splunk_base_path }}"
+        remote_src: yes
+        owner: "{{ os_user }}"
+        group: "{{ os_group }}"
+      become: yes
+
+    - name: Set {{ splunk_uf_home }} owner & group recursively
+      file:
+        path: "{{ splunk_uf_home }}"
+        state: directory
+        owner: "{{ os_user }}"
+        group: "{{ os_group }}"
+        recurse: yes
+      become: yes
+
+    - name: -initd- Splunk enable boot-start
+      command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+      become: yes
+
+    - name: Start the Splunk Universal Forwarder post upgrade
+      command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+      become: yes
+
+    - name: "Create symlink to splunk in /usr/local/bin"
+      file:
+        src: "{{ splunk_uf_home }}/bin/splunk"
+        path: /usr/local/bin/splunk
+        state: link
+        owner: "{{ os_user }}"
+        group: "{{ os_group }}"
+      become: yes

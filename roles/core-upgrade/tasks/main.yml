@@ -1,132 +1,120 @@
 ---
 
-- name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_tgz }}
-  stat: 
-    path: /home/{{ os_user }}/{{ splunk_tgz }}
-    get_checksum: yes  
-    checksum_algorithm: md5
-  register: splunk_tgz_downloaded_flag
+- name: Check for an existing Splunk install
+  stat:
+    path: "{{ splunk_home }}/etc/splunk.version"
+  register: splunk_version_file_stat
   become: yes
 
-- name: -TGZ- Download (wget) {{ splunk_tgz }}
-  get_url:
-    url: "{{ splunk_tgz_url }}"
-    checksum: "{{ splunk_tgz_checksum_resolved | default(omit) }}"
-    dest: /home/{{ os_user }}
-    mode: '0640'  
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-    timeout: 20
+- name: Read the currently installed Splunk version
+  slurp:
+    src: "{{ splunk_home }}/etc/splunk.version"
+  register: splunk_version_file
   become: yes
-  when: splunk_tgz_downloaded_flag.stat.exists == False and download_tgz_from_splunk_servers
+  when: splunk_version_file_stat.stat.exists
 
-- name: -TGZ- Upload ./files/{{ splunk_tgz }} (local) to /home/{{ os_user }}/ (remote)
-  copy:
-    src: "files/{{ splunk_tgz }}"
-    dest: /home/{{ os_user }}
-    mode: '0640'
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
-  when: splunk_tgz_downloaded_flag.stat.exists == False and not download_tgz_from_splunk_servers  
+- name: Record the currently installed Splunk version
+  set_fact:
+    splunk_installed_version: >-
+      {{ (splunk_version_file.content | b64decode | regex_search('VERSION=([0-9.]+)', '\1') | first)
+         if splunk_version_file_stat.stat.exists else 'none' }}
+
+- name: Report that Splunk is already at the target version
+  debug:
+    msg: "Splunk {{ splunk_version }} is already installed at {{ splunk_home }} - nothing to upgrade."
+  when: splunk_installed_version == splunk_version
 
 
-- name: Check if Splunk has ever been run via initd
-  stat: 
-    path: /etc/init.d/splunk
-  register: initd_run_flag
+- name: Upgrade Splunk from {{ splunk_installed_version }} to {{ splunk_version }}
+  when: splunk_installed_version != splunk_version
+  block:
 
-- name: Check if Splunk has ever been run via systemd
-  stat: 
-    path: /etc/systemd/system/Splunkd.service
-  register: systemd_run_flag
+    - name: -TGZ- Fetch the Splunk installer
+      include_role:
+        name: splunk-common
+        tasks_from: fetch-tgz
+      vars:
+        splunk_fetch_tgz: "{{ splunk_tgz }}"
+        splunk_fetch_url: "{{ splunk_tgz_url }}"
+        splunk_fetch_checksum: "{{ splunk_tgz_checksum_resolved | default('') }}"
+        splunk_fetch_download: "{{ download_tgz_from_splunk_servers }}"
 
-- name: -initd- Stop Splunk pre-upgrade
-  command: "{{ splunk_home }}/bin/splunk stop"
-  become: yes  
-  when: initd_run_flag.stat.exists == True
+    - name: Check if Splunk has ever been run via initd
+      stat:
+        path: /etc/init.d/splunk
+      register: initd_run_flag
+      become: yes
 
-- name: -systemd- Stop Splunk pre-upgrade
-  systemd:
-    name: Splunkd
-    state: stopped
-  become: yes
-  when: systemd_run_flag.stat.exists == True
+    - name: Check if Splunk has ever been run via systemd
+      stat:
+        path: /etc/systemd/system/Splunkd.service
+      register: systemd_run_flag
+      become: yes
 
-- name: Extract {{ splunk_tgz }} over {{ splunk_home }} to upgrade
-  unarchive:
-    src: /home/{{ os_user }}/{{ splunk_tgz }}
-    dest: "{{ splunk_base_path }}"
-    remote_src: yes
-    owner: "{{ os_user }}"
-    group: "{{ os_group }}"
-  become: yes
+    - name: -initd- Stop Splunk pre-upgrade
+      command: "{{ splunk_home }}/bin/splunk stop"
+      become: yes
+      when: initd_run_flag.stat.exists
 
-- name: -initd- Start Splunk for the first time post upgrade
-  command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
-  become: yes  
-  when: 
-    - install_method == "initd"
+    - name: -systemd- Stop Splunk pre-upgrade
+      systemd:
+        name: Splunkd
+        state: stopped
+      become: yes
+      when: systemd_run_flag.stat.exists
 
-- name: -systemd- For initd -> systemd upgrades remove initd script
-  command: "{{ splunk_home }}/bin/splunk disable boot-start --no-prompt --answer-yes --accept-license"
-  become: yes
-  when: 
-    - install_method == "systemd"
+    - name: Extract {{ splunk_tgz }} over {{ splunk_home }} to upgrade
+      unarchive:
+        src: /home/{{ os_user }}/{{ splunk_tgz }}
+        dest: "{{ splunk_base_path }}"
+        remote_src: yes
+        owner: "{{ os_user }}"
+        group: "{{ os_group }}"
+      become: yes
 
-- name: -systemd & Splunk 7.2- For initd -> systemd upgrade rebuild systemd script
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
-  become: yes
-  when: 
-    - install_method == "systemd"  
-    - splunk_version is version('7.2.2', '>=')
-    - splunk_version is version('7.3', '<')    
+    - name: -systemd- For initd -> systemd upgrades remove initd script
+      command: "{{ splunk_home }}/bin/splunk disable boot-start --no-prompt --answer-yes --accept-license"
+      become: yes
+      when: install_method == "systemd"
 
-- name: -systemd & Splunk 7.3 to 8.1.0- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1)
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes 
-  when:
-    - install_method == "systemd" 
-    - splunk_version is version('7.3', '>=')
-    - splunk_version is version('8.1.1', '<')
+    - name: -systemd & Splunk 7.2- For initd -> systemd upgrade rebuild systemd script
+      command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
+      become: yes
+      when:
+        - install_method == "systemd"
+        - splunk_version is version('7.2.2', '>=')
+        - splunk_version is version('7.3', '<')
 
-- name: -systemd & Splunk 8.1.1 or later- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1) (-create-polkit-rules 1)
-  command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes 
-  when:
-    - install_method == "systemd" 
-    - splunk_version is version('8.1.1', '>=')    
+    - name: -systemd & Splunk 7.3 to 8.1.0- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1)
+      command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+      become: yes
+      when:
+        - install_method == "systemd"
+        - splunk_version is version('7.3', '>=')
+        - splunk_version is version('8.1.1', '<')
 
-- name: -systemd & Ubuntu- Fix the /etc/systemd/system/Splunkd.service file for Ubuntu support
-  replace:
-    path: /etc/systemd/system/Splunkd.service
-    regexp: '\/init.scope'
-    replace: ''
-  become: yes 
-  when: 
-    - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"   
+    - name: -systemd & Splunk 8.1.1 or later- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1) (-create-polkit-rules 1)
+      command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+      become: yes
+      when:
+        - install_method == "systemd"
+        - splunk_version is version('8.1.1', '>=')
 
-- name: -systemd & Ubuntu- Fix the cgroups path reference in /etc/systemd/system/Splunkd.service (Ubuntu 22.04)
-  replace:
-    path: /etc/systemd/system/Splunkd.service
-    regexp: '\/sys\/fs\/cgroup\/\w+'
-    replace: '/sys/fs/cgroup'
-  become: yes 
-  when: 
-    - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version | int >= 22
+    - name: -systemd- Apply Splunkd.service fixes
+      include_role:
+        name: splunk-common
+        tasks_from: systemd-unit-fixes
+      when: install_method == "systemd"
 
-- name: -systemd & Ubuntu- After Splunkd.service update reload the systemd daemon units
-  command: systemctl daemon-reload
-  become: yes 
-  when: 
-    - install_method == "systemd"  
-    - ansible_distribution == "Ubuntu"      
+    - name: -initd- Start Splunk post upgrade
+      command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
+      become: yes
+      when: install_method == "initd"
 
-- name: -systemd- Start Splunk for the first time post upgrade
-  command: "systemctl start Splunkd"
-  become: yes
-  when: 
-    - install_method == "systemd"
+    - name: -systemd- Start Splunk post upgrade
+      systemd:
+        name: Splunkd
+        state: started
+        enabled: yes
+      become: yes
+      when: install_method == "systemd"

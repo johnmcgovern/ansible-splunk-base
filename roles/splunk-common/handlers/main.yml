@@ -1,0 +1,25 @@
+---
+# Shared handlers. Available to any role that lists splunk-common as a
+# dependency in meta/main.yml.
+#
+# Notify "restart splunk" or "restart splunk uf" from a task whose change
+# requires splunkd to pick up new configuration.
+
+- name: Restart Splunk via systemd
+  systemd:
+    name: Splunkd
+    state: restarted
+  become: yes
+  listen: restart splunk
+  when: install_method == "systemd"
+
+- name: Restart Splunk via the splunk CLI (initd)
+  command: "{{ splunk_home }}/bin/splunk restart"
+  become: yes
+  listen: restart splunk
+  when: install_method == "initd"
+
+- name: Restart the Splunk Universal Forwarder
+  command: "{{ splunk_uf_home }}/bin/splunk restart"
+  become: yes
+  listen: restart splunk uf
