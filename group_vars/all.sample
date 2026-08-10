@@ -62,6 +62,18 @@ splunk_base_path: /opt
 # (true (default) or false)
 check_for_updates: true
 
+# Domains that Splunk is allowed to send alert emails to (allowedDomainList in
+# alert_actions.conf). Left unset, Splunk shows a security warning in the UI
+# because alerts could be emailed to any domain. Set one or more domains to
+# restrict it, for example:
+#
+#   splunk_email_allowed_domains:
+#     - example.com
+#     - subsidiary.example.com
+#
+# An empty list (the default) leaves the setting unmanaged.
+splunk_email_allowed_domains: []
+
 
 #
 # Universal Forwarder Configuration Settings

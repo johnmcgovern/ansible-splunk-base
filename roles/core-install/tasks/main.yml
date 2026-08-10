@@ -146,6 +146,32 @@
     - splunk_version is version('8.1', '>=')
   notify: restart splunk
 
+# Only the allowedDomainList key is managed here, rather than templating the
+# whole file, so that email settings configured in Splunk Web (SMTP server,
+# auth, from address) are left untouched.
+- name: -alert_actions.conf- Ensure the file exists with an [email] stanza
+  ansible.builtin.lineinfile:
+    path: "{{ splunk_home }}/etc/system/local/alert_actions.conf"
+    line: "[email]"
+    create: true
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+    # 0600 to match the mode Splunk uses for the local .conf files it writes.
+    mode: '0600'
+  become: true
+  when: splunk_email_allowed_domains | default([]) | length > 0
+  notify: restart splunk
+
+- name: -alert_actions.conf- Restrict alert email recipients to allowed domains
+  ansible.builtin.lineinfile:
+    path: "{{ splunk_home }}/etc/system/local/alert_actions.conf"
+    regexp: '^allowedDomainList\s*='
+    insertafter: '^\[email\]'
+    line: "allowedDomainList = {{ splunk_email_allowed_domains | default([]) | join(',') }}"
+  become: true
+  when: splunk_email_allowed_domains | default([]) | length > 0
+  notify: restart splunk
+
 - name: Set {{ splunk_home }} owner & group recursively  # noqa: no-handler
   ansible.builtin.file:
     path: "{{ splunk_home }}"
