@@ -8,6 +8,9 @@ argument_specs:
       - >-
         Re-running against an installed host is a no-op: the tarball is
         extracted only when $SPLUNK_HOME/bin/splunk is absent.
+      - >-
+        Honours uf_install_method (see splunk-common) to choose between initd
+        and SplunkForwarder.service.
       - See the splunk-common role for the shared variables this role also uses.
     options:
       splunk_uf_user:

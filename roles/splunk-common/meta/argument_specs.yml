@@ -44,6 +44,19 @@ argument_specs:
             and start task is guarded on this value, so a misspelling skipped
             all of them and left an installed but never-started Splunk behind
             a successful play.
+      uf_install_method:
+        type: str
+        default: initd
+        choices:
+          - systemd
+          - initd
+        description:
+          - Process manager that Universal Forwarder boot-start is configured for.
+          - >-
+            Separate from install_method and defaulting to initd, because that
+            is what the UF roles have always done and, unlike the Enterprise
+            path, the systemd path here has not yet been exercised against a
+            real forwarder.
       download_tgz_from_splunk_servers:
         type: bool
         default: true
@@ -114,11 +127,18 @@ argument_specs:
         description: Download from Splunk (true) or upload from files/ (false).
 
   systemd-unit-fixes:
-    short_description: Patch the generated Splunkd.service unit for Ubuntu
+    short_description: Patch a generated Splunk unit file for Ubuntu
     description:
       - >-
         Removes the /init.scope reference and flattens the cgroup path, then
         reloads systemd only if the unit actually changed.
+    options:
+      unit_path:
+        type: path
+        default: /etc/systemd/system/Splunkd.service
+        description: >-
+          Unit file to patch. The Universal Forwarder's is
+          /etc/systemd/system/SplunkForwarder.service.
 
   boot-start-systemd:
     short_description: Run "splunk enable boot-start" for systemd

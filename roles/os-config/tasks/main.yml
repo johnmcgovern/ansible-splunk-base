@@ -37,11 +37,22 @@
   become: true
 
 
-- name: -ulimits- Set /etc/security/limits.conf for "{{ os_user }}" user
+- name: -ulimits- Install limits drop-in for the "{{ os_user }}" user
   ansible.builtin.template:
-    src: limits.conf.j2
-    dest: "/etc/security/limits.conf"
+    src: 99-splunk.conf.j2
+    dest: /etc/security/limits.d/99-splunk.conf
     mode: '0644'
+  become: true
+
+# Earlier releases of this project replaced /etc/security/limits.conf outright.
+# Drop the lines they added, so the limits are defined in exactly one place.
+# Only lines in the shape this project wrote are matched; anything else in the
+# file, including the distribution's own content, is left alone.
+- name: -ulimits- Remove limits this project previously wrote into limits.conf
+  ansible.builtin.lineinfile:
+    path: /etc/security/limits.conf
+    regexp: '^@{{ os_user }}\s+(hard|soft)\s+\w+\s'
+    state: absent
   become: true
 
 
@@ -118,14 +129,18 @@
     update_cache: true
     cache_valid_time: 3600
   become: true
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when:
+    - os_update_packages | bool
+    - ansible_facts['distribution'] == "Ubuntu"
 
 - name: -Ubuntu- Update all packages to the latest version "apt-get dist-upgrade"
   ansible.builtin.apt:
     upgrade: dist
     autoremove: true
   become: true
-  when: ansible_facts['distribution'] == "Ubuntu"
+  when:
+    - os_update_packages | bool
+    - ansible_facts['distribution'] == "Ubuntu"
 
 
 - name: -RedHat, CentOS, and Amazon Linux- Yum/DNF OS Package Updates  # noqa: package-latest
@@ -133,7 +148,9 @@
     name: "*"
     state: latest
   become: true
-  when: ansible_facts['distribution'] == 'CentOS' or ansible_facts['distribution'] == 'Red Hat Enterprise Linux' or ansible_facts['distribution'] == 'Amazon'
+  when:
+    - os_update_packages | bool
+    - ansible_facts['distribution'] in ['CentOS', 'Red Hat Enterprise Linux', 'Amazon']
 
 
 - name: -PolicyKit- Install PolicyKit using apt-get (supported in 8.1.1)

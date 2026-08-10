@@ -79,24 +79,55 @@
   when: splunk_uf_extracted is changed
 
 
-- name: -initd- Splunk enable boot-start  # noqa: no-handler
-  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+- name: -initd- Splunk enable boot-start
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }}
+      --no-prompt --answer-yes --accept-license
+    creates: /etc/init.d/splunk
   become: true
-  when: splunk_uf_extracted is changed
-  changed_when: true
+  when: uf_install_method == "initd"
 
-- name: Check whether the Universal Forwarder is already running
+- name: -systemd- Splunk enable boot-start
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_uf_home }}/bin/splunk enable boot-start -systemd-managed 1
+      -user {{ os_user }} --no-prompt --answer-yes --accept-license
+    creates: /etc/systemd/system/SplunkForwarder.service
+  become: true
+  when: uf_install_method == "systemd"
+
+- name: -systemd- Apply SplunkForwarder.service fixes
+  ansible.builtin.include_role:
+    name: splunk-common
+    tasks_from: systemd-unit-fixes
+  vars:
+    unit_path: /etc/systemd/system/SplunkForwarder.service
+  when: uf_install_method == "systemd"
+
+- name: -initd- Check whether the Universal Forwarder is already running
   ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk status"
   register: splunk_uf_status
   changed_when: false
   failed_when: false
   become: true
+  when: uf_install_method == "initd"
 
-- name: Start the Splunk Universal Forwarder
+- name: -initd- Start the Splunk Universal Forwarder
   ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
   become: true
-  when: "'is running' not in splunk_uf_status.stdout"
+  when:
+    - uf_install_method == "initd"
+    - "'is running' not in splunk_uf_status.stdout | default('')"
   changed_when: true
+
+- name: -systemd- Ensure the Splunk Universal Forwarder is running
+  ansible.builtin.systemd_service:
+    name: SplunkForwarder
+    state: started
+    enabled: true
+  become: true
+  when: uf_install_method == "systemd"
 
 
 - name: "Create symlink to splunk in /usr/local/bin"

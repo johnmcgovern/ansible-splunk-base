@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+#
+# Resource limits for the Splunk user, installed as a drop-in so that the
+# distribution's own /etc/security/limits.conf is left alone.
+#
+# Note: under systemd, splunkd takes its limits from the Splunkd.service unit
+# (LimitNOFILE and friends), which "splunk enable boot-start" generates. These
+# PAM limits apply to initd startup and to interactive sessions as the
+# {{ os_user }} user.
+#
+# <domain> <type> <item> <value>
+
+@{{ os_user }} hard core 0
+@{{ os_user }} hard maxlogins 10
+@{{ os_user }} soft nofile 65535
+@{{ os_user }} hard nofile 65535
+@{{ os_user }} soft nproc 20480
+@{{ os_user }} hard nproc 20480
+@{{ os_user }} soft fsize unlimited
+@{{ os_user }} hard fsize unlimited

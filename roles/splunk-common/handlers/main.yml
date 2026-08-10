@@ -20,8 +20,17 @@
   when: install_method == "initd"
   changed_when: true
 
-- name: Restart the Splunk Universal Forwarder
+- name: Restart the Splunk Universal Forwarder via systemd
+  ansible.builtin.systemd_service:
+    name: SplunkForwarder
+    state: restarted
+  become: true
+  listen: restart splunk uf
+  when: uf_install_method == "systemd"
+
+- name: Restart the Splunk Universal Forwarder via the splunk CLI (initd)
   ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk restart"
   become: true
   listen: restart splunk uf
+  when: uf_install_method == "initd"
   changed_when: true

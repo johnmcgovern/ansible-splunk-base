@@ -157,6 +157,9 @@ This role has been tested on:
 - Assuming a semi-default install (such as you would find if you installed with this playbook), upgrade.yml will convert from initd process management to systemd process management if you flag "systemd" on install_method.
 - A number of config items are set which disable pop-ups and modal dialogues which would normally be shown to the Splunk admin and/or users such as new version available notifications, UI tours, and python 2.7 deprecation notifications. The goal here is to generally avoid UI annoyances that would crop up in automatic distributed Splunk deployments.
 - This Ansible playbook does not currently handle OS-level firewall allowances for splunkd TCP ports.
+- os-config.yml updates every OS package by default, which is what it has always done for the lab-provisioning case it was written for. Set os_update_packages to false to configure the OS for Splunk without also patching the host.
+- ulimits are installed as /etc/security/limits.d/99-splunk.conf rather than by replacing /etc/security/limits.conf. Hosts configured by an earlier release have the old entries removed from limits.conf on the next os-config run. Note that under systemd, splunkd takes its limits from the Splunkd.service unit; the PAM limits apply to initd startup and to interactive sessions as the splunk user.
+- The Universal Forwarder has its own uf_install_method variable, separate from install_method, and it defaults to initd. Unlike the Splunk Enterprise path, UF systemd management has not yet been exercised against a real forwarder - test it before relying on it.
 - We bias towards being non-destructive. For example, if we see an existing/previous Splunk install we will fail out rather than damage the current install. 
 
 ### To-Do

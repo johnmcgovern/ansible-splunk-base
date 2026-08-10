@@ -19,10 +19,18 @@ splunk_home: /opt/splunk
 splunk_uf_home: /opt/splunkforwarder
 splunk_base_path: /opt
 
-# Process management for Splunk boot-start.
+# Process management for Splunk Enterprise boot-start.
 #   systemd - 7.2.2 or later required.
 #   initd   - Supported on any version, but no Workload Management support.
 install_method: systemd
+
+# Process management for the Universal Forwarder.
+#
+# Deliberately a separate variable, defaulting to initd: that is what the UF
+# roles have always done, and unlike the Enterprise path the systemd path here
+# has not yet been exercised against a real forwarder. Set it to systemd to
+# manage the forwarder through SplunkForwarder.service instead.
+uf_install_method: initd
 
 # Whether to download the tgz installer from Splunk (true), or upload it from
 # the ./files/ directory of this project (false).

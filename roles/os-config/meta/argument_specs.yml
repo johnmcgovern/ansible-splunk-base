@@ -1,0 +1,24 @@
+---
+argument_specs:
+
+  main:
+    short_description: Base OS configuration for a Splunk host
+    description:
+      - >-
+        Sets the hostname, creates the Splunk user, raises ulimits, disables
+        transparent hugepages, opens the web port, and optionally patches the
+        OS.
+      - See the splunk-common role for the shared variables this role also uses.
+    options:
+      os_update_packages:
+        type: bool
+        default: true
+        description:
+          - >-
+            Update every OS package to the latest version as part of this role
+            (apt dist-upgrade, or dnf update on RedHat-family hosts).
+          - >-
+            True is the behaviour this playbook has always had. Set it to false
+            to configure the OS for Splunk without also patching the host - for
+            instance when patching is managed elsewhere, or to avoid an
+            unplanned kernel upgrade.

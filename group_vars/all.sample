@@ -81,10 +81,21 @@ splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/
 #
 # Shown with their defaults. Uncomment only what you want to change.
 
-# Process management for Splunk boot-start.
+# Process management for Splunk Enterprise boot-start.
 #   systemd - 7.2.2 or later required.
 #   initd   - Supported on any version, but no Workload Management support.
 # install_method: systemd
+
+# Process management for the Universal Forwarder. Separate from
+# install_method, and defaults to initd because that is what the UF roles have
+# always done. The systemd path has not yet been exercised against a real
+# forwarder, so test it before relying on it.
+# uf_install_method: initd
+
+# Update every OS package as part of os-config (apt dist-upgrade, or dnf
+# update on RedHat-family hosts). True is what os-config has always done; set
+# it to false to configure the OS for Splunk without also patching the host.
+# os_update_packages: true
 
 # Upload the installer from this project's files/ directory instead of
 # downloading it from Splunk (for air-gapped environments).
