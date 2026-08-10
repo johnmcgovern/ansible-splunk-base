@@ -1,0 +1,56 @@
+---
+# Shared "splunk enable boot-start" ladder for systemd, used by the core
+# install and upgrade roles. Which arguments are accepted changed twice in
+# Splunk's history, so the version conditions live here rather than being
+# maintained in two places.
+#
+# Callers pass:
+#   boot_start_creates - path whose existence skips the command, or omit.
+#                        Install passes the unit file, so an existing
+#                        installation is left alone; upgrade omits it, because
+#                        the unit is deliberately regenerated for the new
+#                        release.
+#
+# Include only when install_method is "systemd".
+
+- name: -systemd & Splunk 7.2.2 to 7.2.x- Splunk enable boot-start (no systemd arguments added)
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}
+      --no-prompt --answer-yes --accept-license
+    creates: "{{ boot_start_creates | default(omit) }}"
+  become: true
+  when:
+    - splunk_version is version('7.2.2', '>=')
+    - splunk_version is version('7.3', '<')
+
+- name: -systemd & Splunk 7.3 to 8.1.0- Splunk enable boot-start (-systemd-managed 1)
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1
+      -user {{ os_user }} --no-prompt --answer-yes --accept-license
+    creates: "{{ boot_start_creates | default(omit) }}"
+  become: true
+  when:
+    - splunk_version is version('7.3', '>=')
+    - splunk_version is version('8.1.1', '<')
+
+- name: -systemd & Splunk 8.1.1 polkit- Install "polkit" for 8.1.1 or later on CentOS, RHEL, and Amazon Linux
+  ansible.builtin.package:
+    name: polkit
+    state: present
+  become: true
+  when:
+    - splunk_version is version('8.1.1', '>=')
+    - ansible_facts['distribution'] in ['CentOS', 'Red Hat Enterprise Linux', 'Amazon']
+
+- name: -systemd & Splunk 8.1.1 or later- Splunk enable boot-start (-systemd-managed 1) (-create-polkit-rules 1)
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1
+      -create-polkit-rules 1 -user {{ os_user }}
+      --no-prompt --answer-yes --accept-license
+    creates: "{{ boot_start_creates | default(omit) }}"
+  become: true
+  when:
+    - splunk_version is version('8.1.1', '>=')

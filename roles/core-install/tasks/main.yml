@@ -221,47 +221,13 @@
     - splunk_version is version('7.2.2', '>=')
 
 
-- name: -systemd & Splunk 7.2.2 to 7.2.x- Splunk enable boot-start (no systemd arguments added)
-  ansible.builtin.command:
-    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-    creates: /etc/systemd/system/Splunkd.service
-  become: true
-  when:
-    - install_method == "systemd"
-    - splunk_version is version('7.2.2', '>=')
-    - splunk_version is version('7.3', '<')
-
-- name: -systemd & Splunk 7.3 to 8.1.0- Splunk enable boot-start (-systemd-managed 1)
-  ansible.builtin.command:
-    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-    creates: /etc/systemd/system/Splunkd.service
-  become: true
-  when:
-    - install_method == "systemd"
-    - splunk_version is version('7.3', '>=')
-    - splunk_version is version('8.1.1', '<')
-
-- name: -systemd & Splunk 8.1.1 polkit- Install "polkit" for 8.1.1 or later on CentOS, RHEL, and Amazon Linux
-  ansible.builtin.package:
-    name: polkit
-    state: present
-  become: true
-  when:
-    - install_method == "systemd"
-    - splunk_version is version('8.1.1', '>=')
-    - ansible_facts['distribution'] == 'CentOS' or ansible_facts['distribution'] == 'Red Hat Enterprise Linux' or ansible_facts['distribution'] == 'Amazon'
-
-- name: -systemd & Splunk 8.1.1 or later- Splunk enable boot-start (-systemd-managed 1) (-create-polkit-rules 1)
-  ansible.builtin.command:
-    cmd: >-
-      {{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1
-      -create-polkit-rules 1 -user {{ os_user }}
-      --no-prompt --answer-yes --accept-license
-    creates: /etc/systemd/system/Splunkd.service
-  become: true
-  when:
-    - install_method == "systemd"
-    - splunk_version is version('8.1.1', '>=')
+- name: -systemd- Configure Splunk boot-start
+  ansible.builtin.include_role:
+    name: splunk-common
+    tasks_from: boot-start-systemd
+  vars:
+    boot_start_creates: /etc/systemd/system/Splunkd.service
+  when: install_method == "systemd"
 
 - name: -systemd- Apply Splunkd.service fixes
   ansible.builtin.include_role:

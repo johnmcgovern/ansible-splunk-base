@@ -3,19 +3,13 @@
 # Note: This works differently from regular combo.yml.
 #   We do not automatically run os-config.yml for a UF OS
 #   but it certainly can be run manually if needed.
-
-- name: Apply prereqs to all nodes
-  hosts: all
-  gather_facts: false
-  roles:
-    - prereqs
+#
+# Composed from the individual playbooks rather than repeating their plays, so
+# the two cannot drift apart. The prereqs play therefore runs twice, which is
+# harmless - it is a no-op on any distribution that already ships python3.
 
 - name: Install Splunk Universal Forwarder
-  hosts: all
-  roles:
-    - uf-install
+  ansible.builtin.import_playbook: uf-install.yml
 
 - name: Configure Splunk Universal Forwarder
-  hosts: all
-  roles:
-    - uf-config
+  ansible.builtin.import_playbook: uf-config.yml

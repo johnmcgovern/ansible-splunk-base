@@ -119,3 +119,36 @@ argument_specs:
       - >-
         Removes the /init.scope reference and flattens the cgroup path, then
         reloads systemd only if the unit actually changed.
+
+  boot-start-systemd:
+    short_description: Run "splunk enable boot-start" for systemd
+    description:
+      - >-
+        Picks the right arguments for the Splunk version in use. Include only
+        when install_method is "systemd".
+    options:
+      boot_start_creates:
+        type: path
+        description:
+          - >-
+            Path whose existence skips the command. Install passes the
+            Splunkd.service unit so an existing installation is left alone;
+            upgrade omits it, because the unit is deliberately regenerated for
+            the new release.
+
+  archive:
+    short_description: Archive a directory into the backups directory
+    description:
+      - >-
+        Writes a timestamped tgz under the os_user home directory. The
+        timestamp comes from the remote host's clock, so each run produces a
+        new file rather than overwriting the last one.
+    options:
+      backup_source:
+        type: path
+        required: true
+        description: Directory to archive.
+      backup_label:
+        type: str
+        required: true
+        description: Goes into the archive filename, e.g. "etc" or "full".

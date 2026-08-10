@@ -84,34 +84,13 @@
       when: install_method == "systemd"
       changed_when: true
 
-    - name: -systemd & Splunk 7.2- For initd -> systemd upgrade rebuild systemd script
-      ansible.builtin.command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
-      become: true
-      when:
-        - install_method == "systemd"
-        - splunk_version is version('7.2.2', '>=')
-        - splunk_version is version('7.3', '<')
-      changed_when: true
-
-    - name: -systemd & Splunk 7.3 to 8.1.0- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1)
-      ansible.builtin.command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-      become: true
-      when:
-        - install_method == "systemd"
-        - splunk_version is version('7.3', '>=')
-        - splunk_version is version('8.1.1', '<')
-      changed_when: true
-
-    - name: -systemd & Splunk 8.1.1 or later- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1) (-create-polkit-rules 1)
-      ansible.builtin.command: >-
-        {{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1
-        -create-polkit-rules 1 -user {{ os_user }}
-        --no-prompt --answer-yes --accept-license
-      become: true
-      when:
-        - install_method == "systemd"
-        - splunk_version is version('8.1.1', '>=')
-      changed_when: true
+    # No boot_start_creates: the unit is deliberately regenerated for the
+    # new release, and for an initd -> systemd conversion it does not exist yet.
+    - name: -systemd- Rebuild Splunk boot-start for the new release
+      ansible.builtin.include_role:
+        name: splunk-common
+        tasks_from: boot-start-systemd
+      when: install_method == "systemd"
 
     - name: -systemd- Apply Splunkd.service fixes
       ansible.builtin.include_role:

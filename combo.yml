@@ -2,19 +2,13 @@
 # This playbook:
 #  1) Performs a basic OS configuration for lab hosts.
 #  2) Installs a base image of Splunk Enterprise.
-
-- name: Apply prereqs to all nodes
-  hosts: all
-  gather_facts: false
-  roles:
-    - prereqs
+#
+# Composed from the individual playbooks rather than repeating their plays, so
+# the two cannot drift apart. The prereqs play therefore runs twice, which is
+# harmless - it is a no-op on any distribution that already ships python3.
 
 - name: Basic OS Configuration & Updates
-  hosts: all
-  roles:
-    - os-config
+  ansible.builtin.import_playbook: os-config.yml
 
 - name: Install Splunk
-  hosts: all
-  roles:
-    - core-install
+  ansible.builtin.import_playbook: install.yml

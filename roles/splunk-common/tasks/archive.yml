@@ -1,0 +1,30 @@
+---
+# Shared backup logic used by the backup-etc and backup-full roles.
+#
+# Callers pass:
+#   backup_source  - path to archive
+#   backup_label   - goes into the filename, e.g. "etc" or "full"
+#
+# The archive is named on the remote host's clock, so each run produces a new
+# file rather than overwriting the last one.
+
+- name: Create /home/{{ os_user }}/backups dir
+  ansible.builtin.file:
+    path: /home/{{ os_user }}/backups
+    state: directory
+    mode: '0755'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: true
+
+- name: Archive (tgz) {{ backup_source }} to /home/{{ os_user }}/backups
+  vars:
+    backup_stamp: "{{ ansible_facts['date_time'].date }}--{{ ansible_facts['date_time'].time | replace(':', '-') }}"
+  community.general.archive:
+    path: "{{ backup_source }}"
+    dest: "/home/{{ os_user }}/backups/splunk-{{ backup_label }}-{{ inventory_hostname }}-{{ backup_stamp }}.tgz"
+    format: gz
+    mode: '0644'
+    owner: "{{ os_user }}"
+    group: "{{ os_group }}"
+  become: true
