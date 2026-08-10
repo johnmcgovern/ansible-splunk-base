@@ -19,24 +19,24 @@
 #
 
 - name: -core- Derive version and filename from splunk_download_url
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_tgz: "{{ splunk_download_url | basename }}"
     splunk_version: "{{ (splunk_download_url | basename).split('-')[1] }}"
     splunk_tgz_url: "{{ splunk_download_url }}"
   when: splunk_download_url | default('') | length > 0
 
 - name: -core- Validate the version parsed from the download URL
-  assert:
+  ansible.builtin.assert:
     that:
       - splunk_version is match('^[0-9]+(\.[0-9]+)+$')
     fail_msg: >-
       Could not parse a version number from '{{ splunk_tgz }}'.
       Set splunk_version explicitly in group_vars/all to override.
-    quiet: yes
+    quiet: true
   when: splunk_download_url | default('') | length > 0
 
 - name: -core- Build download URL from legacy splunk_version/splunk_tgz vars
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_tgz_url: "https://download.splunk.com/products/splunk/releases/{{ splunk_version }}/linux/{{ splunk_tgz }}"
   when:
     - splunk_download_url | default('') | length == 0
@@ -44,12 +44,12 @@
     - splunk_tgz is defined
 
 - name: -core- Resolve checksum (pinned)
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_tgz_checksum_resolved: "{{ splunk_tgz_checksum if ':' in splunk_tgz_checksum else 'md5:' ~ splunk_tgz_checksum }}"
   when: splunk_tgz_checksum | default('') | length > 0
 
 - name: -core- Resolve checksum (sha512 fetched from the Splunk CDN)
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_tgz_checksum_resolved: "sha512:{{ splunk_tgz_url }}.sha512"
   when:
     - splunk_tgz_checksum | default('') | length == 0
@@ -61,24 +61,24 @@
 #
 
 - name: -UF- Derive version and filename from splunk_uf_download_url
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_uf_tgz: "{{ splunk_uf_download_url | basename }}"
     splunk_uf_version: "{{ (splunk_uf_download_url | basename).split('-')[1] }}"
     splunk_uf_tgz_url: "{{ splunk_uf_download_url }}"
   when: splunk_uf_download_url | default('') | length > 0
 
 - name: -UF- Validate the version parsed from the download URL
-  assert:
+  ansible.builtin.assert:
     that:
       - splunk_uf_version is match('^[0-9]+(\.[0-9]+)+$')
     fail_msg: >-
       Could not parse a version number from '{{ splunk_uf_tgz }}'.
       Set splunk_uf_version explicitly in group_vars/all to override.
-    quiet: yes
+    quiet: true
   when: splunk_uf_download_url | default('') | length > 0
 
 - name: -UF- Build download URL from legacy splunk_uf_version/splunk_uf_tgz vars
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_uf_tgz_url: "https://download.splunk.com/products/universalforwarder/releases/{{ splunk_uf_version }}/linux/{{ splunk_uf_tgz }}"
   when:
     - splunk_uf_download_url | default('') | length == 0
@@ -86,12 +86,12 @@
     - splunk_uf_tgz is defined
 
 - name: -UF- Resolve checksum (pinned)
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_uf_tgz_checksum_resolved: "{{ splunk_uf_tgz_checksum if ':' in splunk_uf_tgz_checksum else 'md5:' ~ splunk_uf_tgz_checksum }}"
   when: splunk_uf_tgz_checksum | default('') | length > 0
 
 - name: -UF- Resolve checksum (sha512 fetched from the Splunk CDN)
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_uf_tgz_checksum_resolved: "sha512:{{ splunk_uf_tgz_url }}.sha512"
   when:
     - splunk_uf_tgz_checksum | default('') | length == 0

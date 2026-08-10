@@ -5,5 +5,3 @@
   hosts: all
   roles:
     - core-upgrade
-
-

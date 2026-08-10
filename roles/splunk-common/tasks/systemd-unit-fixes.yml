@@ -6,30 +6,30 @@
 # reports no change. systemd is reloaded only if the unit actually changed.
 
 - name: -systemd & Ubuntu- Fix the /etc/systemd/system/Splunkd.service file for Ubuntu support
-  replace:
+  ansible.builtin.replace:
     path: /etc/systemd/system/Splunkd.service
     regexp: '\/init.scope'
     replace: ''
-  become: yes
+  become: true
   register: splunk_unit_init_scope_fix
   when:
     - install_method == "systemd"
-    - ansible_distribution == "Ubuntu"
+    - ansible_facts['distribution'] == "Ubuntu"
 
 - name: -systemd & Ubuntu- Fix the cgroups path reference in /etc/systemd/system/Splunkd.service (Ubuntu 22.04+)
-  replace:
+  ansible.builtin.replace:
     path: /etc/systemd/system/Splunkd.service
     regexp: '\/sys\/fs\/cgroup\/\w+'
     replace: '/sys/fs/cgroup'
-  become: yes
+  become: true
   register: splunk_unit_cgroup_fix
   when:
     - install_method == "systemd"
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version | int >= 22
+    - ansible_facts['distribution'] == "Ubuntu"
+    - ansible_facts['distribution_major_version'] | int >= 22
 
-- name: -systemd- Reload the systemd daemon units after a Splunkd.service change
-  systemd:
-    daemon_reload: yes
-  become: yes
+- name: -systemd- Reload the systemd daemon units after a Splunkd.service change  # noqa: no-handler
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
   when: splunk_unit_init_scope_fix is changed or splunk_unit_cgroup_fix is changed

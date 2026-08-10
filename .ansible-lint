@@ -1,0 +1,16 @@
+---
+exclude_paths:
+  - .github/
+  - certs/
+  - files/
+
+skip_list:
+  # Task names deliberately embed variables mid-string, e.g.
+  # "-TGZ- Extract {{ splunk_tgz }} to {{ splunk_home }} to install".
+  # The substituted values are what make a run readable, so they stay put.
+  - name[template]
+
+  # Role names use hyphens (core-install, uf-config, tls-config). They are
+  # effectively this project's public API - users reference them from their
+  # own playbooks - so they are not renamed to satisfy the Galaxy pattern.
+  - role-name

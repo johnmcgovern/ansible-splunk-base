@@ -1,74 +1,74 @@
 ---
 
 - name: Create {{ splunk_home }}/etc/auth/mycerts dir
-  file:
+  ansible.builtin.file:
     path: "{{ splunk_home }}/etc/auth/mycerts/"
     state: directory
     mode: '0755'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true
 
 - name: -SSL Certs- Upload public key file (mycerts/cert.pem)
-  copy:
+  ansible.builtin.copy:
     src: "certs/cert.pem"
     dest: "{{ splunk_home }}/etc/auth/mycerts/cert.pem"
     mode: '0640'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true
   notify: restart splunk
 
 - name: -SSL Certs- Upload private key file (mycerts/privkey.pem)
-  copy:
+  ansible.builtin.copy:
     src: "certs/privkey.pem"
     dest: "{{ splunk_home }}/etc/auth/mycerts/privkey.pem"
     mode: '0600'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
-  no_log: yes
+  become: true
+  no_log: true
   notify: restart splunk
 
 
 # "create: yes" means this role also works on a host where web.conf does not
 # exist yet (i.e. run standalone, without core-install having run first).
 - name: -config updates- Ensure web.conf exists and contains the [settings] stanza
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     line: "[settings]"
-    create: yes
+    create: true
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     # 0600: once TLS is enabled Splunk stores an encrypted sslPassword here,
     # and sets this mode itself. Matching it keeps the task idempotent.
     mode: '0600'
-  become: yes
+  become: true
   notify: restart splunk
 
 - name: -config updates- Add serverCert attribute to [settings]
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     regexp: '^serverCert ='
     insertafter: '^\[settings\]'
     line: 'serverCert = {{ splunk_home }}/etc/auth/mycerts/cert.pem'
-  become: yes
+  become: true
   notify: restart splunk
 
 - name: -config updates- Add privKeyPath attribute to [settings]
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     regexp: '^privKeyPath ='
     insertafter: '^\[settings\]'
     line: 'privKeyPath = {{ splunk_home }}/etc/auth/mycerts/privkey.pem'
-  become: yes
+  become: true
   notify: restart splunk
 
 - name: -config updates- Set enableSplunkWebSSL = 1
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     regexp: '^enableSplunkWebSSL ='
     insertafter: '^\[settings\]'
     line: 'enableSplunkWebSSL = 1'
-  become: yes
+  become: true
   notify: restart splunk

@@ -1,26 +1,26 @@
 ---
 
 - name: Check for an existing Splunk install
-  stat:
+  ansible.builtin.stat:
     path: "{{ splunk_home }}/etc/splunk.version"
   register: splunk_version_file_stat
-  become: yes
+  become: true
 
 - name: Read the currently installed Splunk version
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ splunk_home }}/etc/splunk.version"
   register: splunk_version_file
-  become: yes
+  become: true
   when: splunk_version_file_stat.stat.exists
 
 - name: Record the currently installed Splunk version
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_installed_version: >-
       {{ (splunk_version_file.content | b64decode | regex_search('VERSION=([0-9.]+)', '\1') | first)
          if splunk_version_file_stat.stat.exists else 'none' }}
 
 - name: Report that Splunk is already at the target version
-  debug:
+  ansible.builtin.debug:
     msg: "Splunk {{ splunk_version }} is already installed at {{ splunk_home }} - nothing to upgrade."
   when: splunk_installed_version == splunk_version
 
@@ -30,7 +30,7 @@
   block:
 
     - name: -TGZ- Fetch the Splunk installer
-      include_role:
+      ansible.builtin.include_role:
         name: splunk-common
         tasks_from: fetch-tgz
       vars:
@@ -40,81 +40,90 @@
         splunk_fetch_download: "{{ download_tgz_from_splunk_servers }}"
 
     - name: Check if Splunk has ever been run via initd
-      stat:
+      ansible.builtin.stat:
         path: /etc/init.d/splunk
       register: initd_run_flag
-      become: yes
+      become: true
 
     - name: Check if Splunk has ever been run via systemd
-      stat:
+      ansible.builtin.stat:
         path: /etc/systemd/system/Splunkd.service
       register: systemd_run_flag
-      become: yes
+      become: true
 
     - name: -initd- Stop Splunk pre-upgrade
-      command: "{{ splunk_home }}/bin/splunk stop"
-      become: yes
+      ansible.builtin.command: "{{ splunk_home }}/bin/splunk stop"
+      become: true
       when: initd_run_flag.stat.exists
+      changed_when: true
 
     - name: -systemd- Stop Splunk pre-upgrade
-      systemd:
+      ansible.builtin.systemd_service:
         name: Splunkd
         state: stopped
-      become: yes
+      become: true
       when: systemd_run_flag.stat.exists
 
     - name: Extract {{ splunk_tgz }} over {{ splunk_home }} to upgrade
-      unarchive:
+      ansible.builtin.unarchive:
         src: /home/{{ os_user }}/{{ splunk_tgz }}
         dest: "{{ splunk_base_path }}"
-        remote_src: yes
+        remote_src: true
         owner: "{{ os_user }}"
         group: "{{ os_group }}"
-      become: yes
+      become: true
 
     - name: -systemd- For initd -> systemd upgrades remove initd script
-      command: "{{ splunk_home }}/bin/splunk disable boot-start --no-prompt --answer-yes --accept-license"
-      become: yes
+      ansible.builtin.command: "{{ splunk_home }}/bin/splunk disable boot-start --no-prompt --answer-yes --accept-license"
+      become: true
       when: install_method == "systemd"
+      changed_when: true
 
     - name: -systemd & Splunk 7.2- For initd -> systemd upgrade rebuild systemd script
-      command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
-      become: yes
+      ansible.builtin.command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ os_user }}"
+      become: true
       when:
         - install_method == "systemd"
         - splunk_version is version('7.2.2', '>=')
         - splunk_version is version('7.3', '<')
+      changed_when: true
 
     - name: -systemd & Splunk 7.3 to 8.1.0- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1)
-      command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-      become: yes
+      ansible.builtin.command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+      become: true
       when:
         - install_method == "systemd"
         - splunk_version is version('7.3', '>=')
         - splunk_version is version('8.1.1', '<')
+      changed_when: true
 
     - name: -systemd & Splunk 8.1.1 or later- For initd -> systemd upgrade rebuild systemd script (-systemd-managed 1) (-create-polkit-rules 1)
-      command: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -create-polkit-rules 1 -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-      become: yes
+      ansible.builtin.command: >-
+        {{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1
+        -create-polkit-rules 1 -user {{ os_user }}
+        --no-prompt --answer-yes --accept-license
+      become: true
       when:
         - install_method == "systemd"
         - splunk_version is version('8.1.1', '>=')
+      changed_when: true
 
     - name: -systemd- Apply Splunkd.service fixes
-      include_role:
+      ansible.builtin.include_role:
         name: splunk-common
         tasks_from: systemd-unit-fixes
       when: install_method == "systemd"
 
     - name: -initd- Start Splunk post upgrade
-      command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
-      become: yes
+      ansible.builtin.command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
+      become: true
       when: install_method == "initd"
+      changed_when: true
 
     - name: -systemd- Start Splunk post upgrade
-      systemd:
+      ansible.builtin.systemd_service:
         name: Splunkd
         state: started
-        enabled: yes
-      become: yes
+        enabled: true
+      become: true
       when: install_method == "systemd"

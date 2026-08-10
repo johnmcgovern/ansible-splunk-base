@@ -1,0 +1,11 @@
+---
+# Collections used by this project beyond ansible.builtin.
+#
+# The full "ansible" package bundles these already, but a minimal
+# "ansible-core" install does not. Install them with:
+#
+#   ansible-galaxy collection install -r requirements.yml
+
+collections:
+  - name: ansible.posix        # firewalld (os-config)
+  - name: community.general    # archive (backup-etc, backup-full)

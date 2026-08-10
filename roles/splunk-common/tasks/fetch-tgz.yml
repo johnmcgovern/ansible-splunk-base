@@ -11,13 +11,13 @@
 #   splunk_fetch_download  - true to download from Splunk, false to upload from ./files/
 
 - name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_fetch_tgz }}
-  stat:
+  ansible.builtin.stat:
     path: /home/{{ os_user }}/{{ splunk_fetch_tgz }}
   register: splunk_fetch_tgz_stat
-  become: yes
+  become: true
 
 - name: -TGZ- Download {{ splunk_fetch_tgz }} from Splunk
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ splunk_fetch_url }}"
     checksum: "{{ splunk_fetch_checksum | default('') }}"
     dest: /home/{{ os_user }}/{{ splunk_fetch_tgz }}
@@ -25,19 +25,19 @@
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     timeout: 60
-  become: yes
+  become: true
   when:
     - not splunk_fetch_tgz_stat.stat.exists
     - splunk_fetch_download | bool
 
 - name: -TGZ- Upload ./files/{{ splunk_fetch_tgz }} (local) to /home/{{ os_user }}/ (remote)
-  copy:
+  ansible.builtin.copy:
     src: "{{ playbook_dir }}/files/{{ splunk_fetch_tgz }}"
     dest: /home/{{ os_user }}/{{ splunk_fetch_tgz }}
     mode: '0640'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true
   when:
     - not splunk_fetch_tgz_stat.stat.exists
     - not (splunk_fetch_download | bool)

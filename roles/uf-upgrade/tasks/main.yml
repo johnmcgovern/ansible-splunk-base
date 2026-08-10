@@ -1,26 +1,26 @@
 ---
 
 - name: Check for an existing Universal Forwarder install
-  stat:
+  ansible.builtin.stat:
     path: "{{ splunk_uf_home }}/etc/splunk.version"
   register: splunk_uf_version_file_stat
-  become: yes
+  become: true
 
 - name: Read the currently installed Universal Forwarder version
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ splunk_uf_home }}/etc/splunk.version"
   register: splunk_uf_version_file
-  become: yes
+  become: true
   when: splunk_uf_version_file_stat.stat.exists
 
 - name: Record the currently installed Universal Forwarder version
-  set_fact:
+  ansible.builtin.set_fact:
     splunk_uf_installed_version: >-
       {{ (splunk_uf_version_file.content | b64decode | regex_search('VERSION=([0-9.]+)', '\1') | first)
          if splunk_uf_version_file_stat.stat.exists else 'none' }}
 
 - name: Report that the Universal Forwarder is already at the target version
-  debug:
+  ansible.builtin.debug:
     msg: "Splunk Universal Forwarder {{ splunk_uf_version }} is already installed at {{ splunk_uf_home }} - nothing to upgrade."
   when: splunk_uf_installed_version == splunk_uf_version
 
@@ -30,16 +30,16 @@
   block:
 
     - name: Ensure {{ splunk_uf_home }} dir exists
-      file:
+      ansible.builtin.file:
         path: "{{ splunk_uf_home }}"
         state: directory
         mode: '0755'
         owner: "{{ os_user }}"
         group: "{{ os_group }}"
-      become: yes
+      become: true
 
     - name: -TGZ- Fetch the Splunk Universal Forwarder installer
-      include_role:
+      ansible.builtin.include_role:
         name: splunk-common
         tasks_from: fetch-tgz
       vars:
@@ -49,41 +49,44 @@
         splunk_fetch_download: "{{ download_uf_tgz_from_splunk_servers }}"
 
     - name: -initd- Stop the UF
-      command: "{{ splunk_uf_home }}/bin/splunk stop"
-      become: yes
+      ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk stop"
+      become: true
       when: splunk_uf_version_file_stat.stat.exists
+      changed_when: true
 
     - name: Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to upgrade
-      unarchive:
+      ansible.builtin.unarchive:
         src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
         dest: "{{ splunk_base_path }}"
-        remote_src: yes
+        remote_src: true
         owner: "{{ os_user }}"
         group: "{{ os_group }}"
-      become: yes
+      become: true
 
     - name: Set {{ splunk_uf_home }} owner & group recursively
-      file:
+      ansible.builtin.file:
         path: "{{ splunk_uf_home }}"
         state: directory
         owner: "{{ os_user }}"
         group: "{{ os_group }}"
-        recurse: yes
-      become: yes
+        recurse: true
+      become: true
 
     - name: -initd- Splunk enable boot-start
-      command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-      become: yes
+      ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+      become: true
+      changed_when: true
 
     - name: Start the Splunk Universal Forwarder post upgrade
-      command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-      become: yes
+      ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+      become: true
+      changed_when: true
 
     - name: "Create symlink to splunk in /usr/local/bin"
-      file:
+      ansible.builtin.file:
         src: "{{ splunk_uf_home }}/bin/splunk"
         path: /usr/local/bin/splunk
         state: link
         owner: "{{ os_user }}"
         group: "{{ os_group }}"
-      become: yes
+      become: true

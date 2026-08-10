@@ -1,0 +1,23 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 160
+  truthy:
+    allowed-values: ['true', 'false']
+  comments:
+    min-spaces-from-content: 1
+  braces:
+    max-spaces-inside: 1
+  # The three settings below are required by ansible-lint, which shares this
+  # configuration. Changing them makes ansible-lint fall back to its own.
+  comments-indentation: false
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
+ignore: |
+  .github/
+  certs/
+  files/

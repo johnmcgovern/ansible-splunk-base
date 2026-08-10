@@ -5,7 +5,7 @@
 
 - name: Apply prereqs to all nodes
   hosts: all
-  gather_facts: no
+  gather_facts: false
   roles:
     - prereqs
 

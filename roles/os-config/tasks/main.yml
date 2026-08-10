@@ -1,149 +1,151 @@
 ---
 
 - name: Check if cloud-init exists on this system
-  stat:
+  ansible.builtin.stat:
     path: /etc/cloud/
   register: cloud_init_exists
 
 - name: Tell cloud-init that its job is done (preserves hostname through reboots)
-  file:
+  ansible.builtin.file:
     path: /etc/cloud/cloud-init.disabled
     state: touch
+    mode: '0644'
     access_time: preserve
     modification_time: preserve
-  become: yes
+  become: true
   when: cloud_init_exists.stat.exists
 
 - name: Set the hostname as per the Ansible inventory file
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
-  become: yes
+  become: true
 
 
 - name: Add "{{ os_group }}" group (so we can set ulimits)
-  group:
+  ansible.builtin.group:
     name: "{{ os_group }}"
     state: present
-  become: yes
+  become: true
 
 - name: Add "{{ os_user }}" user with the home dir /home/{{ os_user }}/ (so we can set ulimits)
-  user:
+  ansible.builtin.user:
     name: "{{ os_user }}"
     group: "{{ os_group }}"
     home: /home/{{ os_user }}/
     shell: /bin/bash
     comment: Splunk User
-  become: yes
+  become: true
 
 
 - name: -ulimits- Set /etc/security/limits.conf for "{{ os_user }}" user
-  template:
+  ansible.builtin.template:
     src: limits.conf.j2
     dest: "/etc/security/limits.conf"
     mode: '0644'
-  become: yes
+  become: true
 
 
 - name: -THP- Install disable-thp script to be run at boot time
-  template:
+  ansible.builtin.template:
     src: disable-thp.j2
     dest: "/usr/local/bin/disable-thp"
     mode: '0754'
-  become: yes
+  become: true
 
 - name: -THP- Install disable-thp systemd unit file
-  template:
+  ansible.builtin.template:
     src: disable-thp.service.j2
     dest: "/etc/systemd/system/disable-thp.service"
     mode: '0644'
-  become: yes
+  become: true
   register: disable_thp_unit
 
-- name: -THP- Reload the systemd daemon units after a disable-thp.service change
-  systemd:
-    daemon_reload: yes
-  become: yes
+- name: -THP- Reload the systemd daemon units after a disable-thp.service change  # noqa: no-handler
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
   when: disable_thp_unit is changed
 
 - name: -THP- Configure systemd to run disable-thp at boot time
-  systemd:
+  ansible.builtin.systemd_service:
     name: disable-thp
-    enabled: yes
-    masked: no
-  become: yes
+    enabled: true
+    masked: false
+  become: true
 
 - name: -THP- Check the current transparent hugepage setting
-  command: cat /sys/kernel/mm/transparent_hugepage/enabled
+  ansible.builtin.command: cat /sys/kernel/mm/transparent_hugepage/enabled
   register: thp_state
   changed_when: false
   failed_when: false
 
 - name: -THP- Run the disable-thp script
-  command: /usr/local/bin/disable-thp
-  become: yes
+  ansible.builtin.command: /usr/local/bin/disable-thp
+  become: true
   when: "'[never]' not in thp_state.stdout | default('')"
+  changed_when: true
 
 
 - name: -firewalld- Check if /usr/sbin/firewalld exists
-  stat:
+  ansible.builtin.stat:
     path: /usr/sbin/firewalld
   register: firewalld_flag
 
 - name: -firewalld-  Allow tcp/8000 traffic through firewalld
-  firewalld:
+  ansible.posix.firewalld:
     port: "8000/tcp"
-    permanent: yes
-    immediate: yes
+    permanent: true
+    immediate: true
     state: enabled
-  become: yes
+  become: true
   when: firewalld_flag.stat.exists
 
 
 - name: -iptables- Redirect 443 to 8000 (Ubuntu and Amazon Linux)
-  iptables:
+  ansible.builtin.iptables:
     table: nat
     chain: PREROUTING
     protocol: tcp
     destination_port: "443"
     jump: REDIRECT
     to_ports: "8000"
-  become: yes
-  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Amazon'
+  become: true
+  when: ansible_facts['distribution'] == 'Ubuntu' or ansible_facts['distribution'] == 'Amazon'
 
 
 - name: -Ubuntu Updates- Run the equivalent of "apt-get update" as a separate step
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
+    update_cache: true
     cache_valid_time: 3600
-  become: yes
-  when: ansible_distribution == "Ubuntu"
+  become: true
+  when: ansible_facts['distribution'] == "Ubuntu"
 
 - name: -Ubuntu- Update all packages to the latest version "apt-get dist-upgrade"
-  apt:
+  ansible.builtin.apt:
     upgrade: dist
-    autoremove: yes
-  become: yes
-  when: ansible_distribution == "Ubuntu"
+    autoremove: true
+  become: true
+  when: ansible_facts['distribution'] == "Ubuntu"
 
 
-- name: -RedHat, CentOS, and Amazon Linux- Yum/DNF OS Package Updates
-  package:
+- name: -RedHat, CentOS, and Amazon Linux- Yum/DNF OS Package Updates  # noqa: package-latest
+  ansible.builtin.package:
     name: "*"
     state: latest
-  become: yes
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
+  become: true
+  when: ansible_facts['distribution'] == 'CentOS' or ansible_facts['distribution'] == 'Red Hat Enterprise Linux' or ansible_facts['distribution'] == 'Amazon'
 
 
 - name: -PolicyKit- Install PolicyKit using apt-get (supported in 8.1.1)
-  apt:
-    name: "{{ 'polkitd' if ansible_distribution_major_version | int >= 24 else 'policykit-1' }}"
+  ansible.builtin.apt:
+    name: "{{ 'polkitd' if ansible_facts['distribution_major_version'] | int >= 24 else 'policykit-1' }}"
     state: present
-  become: yes
-  when: ansible_distribution == "Ubuntu"
+  become: true
+  when: ansible_facts['distribution'] == "Ubuntu"
 
 - name: -PolicyKit- Install PolicyKit using yum/dnf (supported in 8.1.1)
-  package:
+  ansible.builtin.package:
     name: polkit
     state: present
-  become: yes
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux' or ansible_distribution == 'Amazon'
+  become: true
+  when: ansible_facts['distribution'] == 'CentOS' or ansible_facts['distribution'] == 'Red Hat Enterprise Linux' or ansible_facts['distribution'] == 'Amazon'

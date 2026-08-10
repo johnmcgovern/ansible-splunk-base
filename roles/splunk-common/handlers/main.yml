@@ -6,20 +6,22 @@
 # requires splunkd to pick up new configuration.
 
 - name: Restart Splunk via systemd
-  systemd:
+  ansible.builtin.systemd_service:
     name: Splunkd
     state: restarted
-  become: yes
+  become: true
   listen: restart splunk
   when: install_method == "systemd"
 
 - name: Restart Splunk via the splunk CLI (initd)
-  command: "{{ splunk_home }}/bin/splunk restart"
-  become: yes
+  ansible.builtin.command: "{{ splunk_home }}/bin/splunk restart"
+  become: true
   listen: restart splunk
   when: install_method == "initd"
+  changed_when: true
 
 - name: Restart the Splunk Universal Forwarder
-  command: "{{ splunk_uf_home }}/bin/splunk restart"
-  become: yes
+  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk restart"
+  become: true
   listen: restart splunk uf
+  changed_when: true

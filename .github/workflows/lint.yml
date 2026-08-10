@@ -1,0 +1,44 @@
+---
+name: Lint
+
+"on":
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: ansible-lint & yamllint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ansible-core, ansible-lint, and yamllint
+        run: pip install ansible-core ansible-lint yamllint
+
+      - name: Install required collections
+        run: ansible-galaxy collection install -r requirements.yml
+
+      - name: Run yamllint
+        run: yamllint .
+
+      - name: Run ansible-lint
+        run: ansible-lint
+
+      - name: Syntax-check every playbook
+        run: |
+          cp hosts.sample hosts
+          cp group_vars/all.sample group_vars/all
+          for playbook in *.yml; do
+            [ "$playbook" = "requirements.yml" ] && continue
+            echo "== $playbook"
+            ansible-playbook --syntax-check "$playbook"
+          done

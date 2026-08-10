@@ -1,12 +1,12 @@
 ---
 # This playbook installs AND configures the Splunk UF.
-# Note: This works differently from regular combo.yml. 
+# Note: This works differently from regular combo.yml.
 #   We do not automatically run os-config.yml for a UF OS
 #   but it certainly can be run manually if needed.
 
 - name: Apply prereqs to all nodes
   hosts: all
-  gather_facts: no
+  gather_facts: false
   roles:
     - prereqs
 
@@ -19,6 +19,3 @@
   hosts: all
   roles:
     - uf-config
-
-
-

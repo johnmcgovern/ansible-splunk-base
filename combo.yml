@@ -5,14 +5,14 @@
 
 - name: Apply prereqs to all nodes
   hosts: all
-  gather_facts: no
+  gather_facts: false
   roles:
     - prereqs
 
 - name: Basic OS Configuration & Updates
   hosts: all
   roles:
-    - os-config    
+    - os-config
 
 - name: Install Splunk
   hosts: all

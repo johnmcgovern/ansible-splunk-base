@@ -9,6 +9,7 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
  
 		- sudo apt-get install ansible (Ubuntu) 
 		- brew install ansible (macOS)
+		- pipx install ansible-core (any platform, isolated)
 
 2. git clone this project
 
@@ -17,6 +18,14 @@ This is an Ansible project that installs or upgrades Splunk to a specific versio
 3. Navigate to project base directory
 
 		- cd ./ansible-splunk-base		
+
+3a. Install the required collections
+
+	This project uses ansible.posix (firewalld) and community.general (archive)
+	in addition to ansible.builtin. The full "ansible" package already bundles
+	them; a minimal "ansible-core" install does not.
+
+		- ansible-galaxy collection install -r requirements.yml
 
 4. Copy hosts.sample to hosts
 
@@ -70,6 +79,10 @@ group_vars/all.sample.
 1. Navigate to playbook base directory
 
 		- cd ./ansible-splunk-base
+
+	The bundled ansible.cfg sets the default inventory to ./hosts, so "-i hosts"
+	is optional from the project directory. It is shown below for clarity and
+	for anyone running from elsewhere.
 	
 2. Run the Splunk install playbook
 

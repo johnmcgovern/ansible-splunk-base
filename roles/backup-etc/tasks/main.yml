@@ -1,20 +1,22 @@
 ---
 
 - name: Create /home/{{ os_user }}/backups dir
-  file:
+  ansible.builtin.file:
     path: /home/{{ os_user }}/backups
     state: directory
     mode: '0755'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true
 
 - name: Archive (tgz) {{ splunk_home }}/etc to /home/{{ os_user }}/backups
-  archive:
+  vars:
+    backup_stamp: "{{ ansible_facts['date_time'].date }}--{{ ansible_facts['date_time'].time | replace(':', '-') }}"
+  community.general.archive:
     path: "{{ splunk_home }}/etc"
-    dest: "/home/{{ os_user }}/backups/splunk-etc-{{ inventory_hostname }}-{{ ansible_date_time.date }}--{{ ansible_date_time.time | replace(':', '-') }}.tgz"
+    dest: "/home/{{ os_user }}/backups/splunk-etc-{{ inventory_hostname }}-{{ backup_stamp }}.tgz"
     format: gz
     mode: '0644'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true

@@ -1,32 +1,32 @@
 ---
 
 - name: Add {{ os_group }} group
-  group:
+  ansible.builtin.group:
     name: "{{ os_group }}"
     state: present
-  become: yes
+  become: true
 
 - name: Add {{ os_user }} user
-  user:
+  ansible.builtin.user:
     name: "{{ os_user }}"
     group: "{{ os_group }}"
     home: /home/{{ os_user }}
     shell: /bin/bash
     comment: Splunk User
-  become: yes
+  become: true
 
 - name: Create {{ splunk_uf_home }} dir
-  file:
+  ansible.builtin.file:
     path: "{{ splunk_uf_home }}"
     state: directory
     mode: '0755'
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true
 
 
 - name: -TGZ- Fetch the Splunk Universal Forwarder installer
-  include_role:
+  ansible.builtin.include_role:
     name: splunk-common
     tasks_from: fetch-tgz
   vars:
@@ -38,65 +38,67 @@
 # "creates" keeps us non-destructive: an existing install is never extracted
 # over, and re-running uf-install.yml against an installed host is a no-op.
 - name: -TGZ- Extract {{ splunk_uf_tgz }} to {{ splunk_uf_home }} to install
-  unarchive:
+  ansible.builtin.unarchive:
     src: /home/{{ os_user }}/{{ splunk_uf_tgz }}
     dest: "{{ splunk_base_path }}"
-    remote_src: yes
+    remote_src: true
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     creates: "{{ splunk_uf_home }}/bin/splunk"
   register: splunk_uf_extracted
-  become: yes
+  become: true
 
 
 # Splunk consumes and deletes user-seed.conf on first start. It is written
 # only for a fresh install so that re-running this role never resets the
 # admin password on an existing forwarder.
-- name: Create user-seed.conf file for default admin creds
-  template:
+- name: Create user-seed.conf file for default admin creds  # noqa: no-handler
+  ansible.builtin.template:
     src: user-seed.conf.j2
     dest: "{{ splunk_uf_home }}/etc/system/local/user-seed.conf"
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
     mode: '0600'
-  become: yes
-  no_log: yes
+  become: true
+  no_log: true
   when: splunk_uf_extracted is changed
 
-- name: Set {{ splunk_uf_home }} owner & group recursively
-  file:
+- name: Set {{ splunk_uf_home }} owner & group recursively  # noqa: no-handler
+  ansible.builtin.file:
     path: "{{ splunk_uf_home }}"
     state: directory
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-    recurse: yes
-  become: yes
+    recurse: true
+  become: true
   when: splunk_uf_extracted is changed
 
 
-- name: -initd- Splunk enable boot-start
-  command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
-  become: yes
+- name: -initd- Splunk enable boot-start  # noqa: no-handler
+  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }} --no-prompt --answer-yes --accept-license"
+  become: true
   when: splunk_uf_extracted is changed
+  changed_when: true
 
 - name: Check whether the Universal Forwarder is already running
-  command: "{{ splunk_uf_home }}/bin/splunk status"
+  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk status"
   register: splunk_uf_status
   changed_when: false
   failed_when: false
-  become: yes
+  become: true
 
 - name: Start the Splunk Universal Forwarder
-  command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
-  become: yes
+  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: true
   when: "'is running' not in splunk_uf_status.stdout"
+  changed_when: true
 
 
 - name: "Create symlink to splunk in /usr/local/bin"
-  file:
+  ansible.builtin.file:
     src: "{{ splunk_uf_home }}/bin/splunk"
     path: /usr/local/bin/splunk
     state: link
     owner: "{{ os_user }}"
     group: "{{ os_group }}"
-  become: yes
+  become: true
