@@ -137,6 +137,62 @@ group_vars/all.sample.
 		- ansible-playbook -i hosts os-config.yml install.yml tls-config.yml
 
 
+### Protecting the Splunk Credentials
+
+group_vars/all holds splunk_pass and splunk_uf_pass in plain text. To encrypt
+them, turn group_vars/all into a directory and split the secrets into their own
+encrypted file. Ansible reads every file in group_vars/all/, so both are picked
+up automatically.
+
+Note that an extra file such as group_vars/all_secrets.yml is NOT read -
+Ansible would treat that as variables for a group called "all_secrets", which
+does not exist, and your settings would be silently ignored.
+
+1. Turn the file into a directory
+
+		- mkdir group_vars/all.tmp
+		- mv group_vars/all group_vars/all.tmp/vars.yml
+		- mv group_vars/all.tmp group_vars/all
+
+2. Create the encrypted file beside it
+
+		- ansible-vault create group_vars/all/vault.yml
+
+3. Put the credentials in it, and delete them from group_vars/all/vars.yml
+
+		splunk_pass: yourRealPassword
+		splunk_uf_pass: yourRealPassword
+
+4. Run any playbook with the vault password
+
+		- ansible-playbook -i hosts install.yml --ask-vault-pass
+
+	Or point at a password file instead of typing it:
+
+		- ansible-playbook -i hosts install.yml --vault-password-file ~/.splunk-vault-pass
+
+Edit it later with "ansible-vault edit group_vars/all/vault.yml". To confirm a
+file really is encrypted, check that it starts with "$ANSIBLE_VAULT":
+
+		- head -1 group_vars/all/vault.yml
+
+.gitignore excludes group_vars/all, which covers the directory and everything
+in it, so neither file is committed.
+
+
+### Role Documentation
+
+Each role has a README describing what it does and the variables it takes, and
+a meta/argument_specs.yml that Ansible validates before the role runs:
+
+- roles/splunk-common - shared variables, handlers, and helper task files
+- roles/core-install, roles/core-upgrade - Splunk Enterprise
+- roles/uf-install, roles/uf-config, roles/uf-upgrade - Universal Forwarder
+- roles/os-config, roles/tls-config - host and TLS configuration
+- roles/backup-etc, roles/backup-full - backups
+- roles/prereqs - python3 bootstrap
+
+
 ### Compatibility
 
 This role has been tested on:
