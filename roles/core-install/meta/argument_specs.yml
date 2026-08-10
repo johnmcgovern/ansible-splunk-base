@@ -1,0 +1,46 @@
+---
+argument_specs:
+
+  main:
+    short_description: Install Splunk Enterprise (Core)
+    description:
+      - >-
+        Installs Splunk Enterprise from the tarball, applies a base
+        configuration, and configures boot-start.
+      - >-
+        Re-running against an installed host is a no-op: the tarball is
+        extracted only when $SPLUNK_HOME/bin/splunk is absent.
+      - See the splunk-common role for the shared variables this role also uses.
+    options:
+      splunk_user:
+        type: str
+        required: true
+        description: >-
+          Splunk Enterprise admin username, seeded through user-seed.conf on
+          first install only. Deliberately has no default - it is a credential.
+      splunk_pass:
+        type: str
+        required: true
+        description: >-
+          Password for splunk_user, seeded on first install only. Deliberately
+          has no default. Consider holding this in an ansible-vault file.
+      check_for_updates:
+        type: bool
+        default: true
+        description: >-
+          Let Splunk check for new releases. False writes
+          updateCheckerBaseURL = 0 into web.conf.
+      splunk_email_allowed_domains:
+        type: list
+        elements: str
+        default: []
+        description:
+          - >-
+            Domains Splunk may send alert emails to (allowedDomainList in
+            alert_actions.conf). An empty list leaves the setting unmanaged,
+            which is what Splunk warns about in the UI.
+          - >-
+            A single domain may be given as a bare string; the role wraps it.
+            Note that Ansible accepts a string for a list-typed option, so this
+            spec documents the expected shape rather than enforcing it - the
+            task is what makes both forms produce the same config.

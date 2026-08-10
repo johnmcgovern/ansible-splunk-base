@@ -1,5 +1,10 @@
 ---
 
+- name: Resolve the Splunk download URL, version, and checksum
+  ansible.builtin.include_role:
+    name: splunk-common
+    tasks_from: resolve-version
+
 - name: Add {{ os_group }} group
   ansible.builtin.group:
     name: "{{ os_group }}"

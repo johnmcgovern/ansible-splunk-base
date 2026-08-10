@@ -1,98 +1,13 @@
 ---
-# Resolves Splunk download variables for Splunk Enterprise (Core) and the
-# Universal Forwarder. Runs as a dependency of the install/upgrade roles.
+# Intentionally empty.
 #
-# URL-first (preferred): set splunk_download_url and/or splunk_uf_download_url
-#   to the full tgz URL from splunk.com. Version, filename, and sha512
-#   checksum are derived automatically.
+# splunk-common is depended on by the other roles for its defaults, handlers,
+# and argument validation - not to run tasks. Its actual task files are
+# included explicitly by name:
 #
-# Legacy form (still supported): set splunk_version + splunk_tgz +
-#   splunk_tgz_checksum (bare md5 hash), and the equivalent splunk_uf_* vars.
+#   resolve-version.yml    - derive version/filename/checksum from the URL
+#   fetch-tgz.yml          - download or upload the installer
+#   systemd-unit-fixes.yml - patch the generated Splunkd.service unit
 #
-# A pinned splunk_tgz_checksum / splunk_uf_tgz_checksum always wins over the
-# CDN sha512. Bare hashes are treated as md5; prefixed ("sha512:<hash>",
-# "sha256:<hash>", "md5:<hash>") are used as-is.
-
-
-#
-# Splunk Enterprise (Core)
-#
-
-- name: -core- Derive version and filename from splunk_download_url
-  ansible.builtin.set_fact:
-    splunk_tgz: "{{ splunk_download_url | basename }}"
-    splunk_version: "{{ (splunk_download_url | basename).split('-')[1] }}"
-    splunk_tgz_url: "{{ splunk_download_url }}"
-  when: splunk_download_url | default('') | length > 0
-
-- name: -core- Validate the version parsed from the download URL
-  ansible.builtin.assert:
-    that:
-      - splunk_version is match('^[0-9]+(\.[0-9]+)+$')
-    fail_msg: >-
-      Could not parse a version number from '{{ splunk_tgz }}'.
-      Set splunk_version explicitly in group_vars/all to override.
-    quiet: true
-  when: splunk_download_url | default('') | length > 0
-
-- name: -core- Build download URL from legacy splunk_version/splunk_tgz vars
-  ansible.builtin.set_fact:
-    splunk_tgz_url: "https://download.splunk.com/products/splunk/releases/{{ splunk_version }}/linux/{{ splunk_tgz }}"
-  when:
-    - splunk_download_url | default('') | length == 0
-    - splunk_version is defined
-    - splunk_tgz is defined
-
-- name: -core- Resolve checksum (pinned)
-  ansible.builtin.set_fact:
-    splunk_tgz_checksum_resolved: "{{ splunk_tgz_checksum if ':' in splunk_tgz_checksum else 'md5:' ~ splunk_tgz_checksum }}"
-  when: splunk_tgz_checksum | default('') | length > 0
-
-- name: -core- Resolve checksum (sha512 fetched from the Splunk CDN)
-  ansible.builtin.set_fact:
-    splunk_tgz_checksum_resolved: "sha512:{{ splunk_tgz_url }}.sha512"
-  when:
-    - splunk_tgz_checksum | default('') | length == 0
-    - splunk_download_url | default('') | length > 0
-
-
-#
-# Splunk Universal Forwarder
-#
-
-- name: -UF- Derive version and filename from splunk_uf_download_url
-  ansible.builtin.set_fact:
-    splunk_uf_tgz: "{{ splunk_uf_download_url | basename }}"
-    splunk_uf_version: "{{ (splunk_uf_download_url | basename).split('-')[1] }}"
-    splunk_uf_tgz_url: "{{ splunk_uf_download_url }}"
-  when: splunk_uf_download_url | default('') | length > 0
-
-- name: -UF- Validate the version parsed from the download URL
-  ansible.builtin.assert:
-    that:
-      - splunk_uf_version is match('^[0-9]+(\.[0-9]+)+$')
-    fail_msg: >-
-      Could not parse a version number from '{{ splunk_uf_tgz }}'.
-      Set splunk_uf_version explicitly in group_vars/all to override.
-    quiet: true
-  when: splunk_uf_download_url | default('') | length > 0
-
-- name: -UF- Build download URL from legacy splunk_uf_version/splunk_uf_tgz vars
-  ansible.builtin.set_fact:
-    splunk_uf_tgz_url: "https://download.splunk.com/products/universalforwarder/releases/{{ splunk_uf_version }}/linux/{{ splunk_uf_tgz }}"
-  when:
-    - splunk_uf_download_url | default('') | length == 0
-    - splunk_uf_version is defined
-    - splunk_uf_tgz is defined
-
-- name: -UF- Resolve checksum (pinned)
-  ansible.builtin.set_fact:
-    splunk_uf_tgz_checksum_resolved: "{{ splunk_uf_tgz_checksum if ':' in splunk_uf_tgz_checksum else 'md5:' ~ splunk_uf_tgz_checksum }}"
-  when: splunk_uf_tgz_checksum | default('') | length > 0
-
-- name: -UF- Resolve checksum (sha512 fetched from the Splunk CDN)
-  ansible.builtin.set_fact:
-    splunk_uf_tgz_checksum_resolved: "sha512:{{ splunk_uf_tgz_url }}.sha512"
-  when:
-    - splunk_uf_tgz_checksum | default('') | length == 0
-    - splunk_uf_download_url | default('') | length > 0
+# Keeping main.yml empty means roles that only need the shared variables
+# (os-config, the backup roles) do not run a dozen skipped tasks.

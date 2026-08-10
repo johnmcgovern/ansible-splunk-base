@@ -1,0 +1,29 @@
+---
+argument_specs:
+
+  main:
+    short_description: Configure an installed Universal Forwarder
+    description:
+      - >-
+        Points the forwarder at a deployment server and forwards its _internal
+        logs to the indexing tier.
+      - See the splunk-common role for the shared variables this role also uses.
+    options:
+      uf_deploy_server_address:
+        type: str
+        default: 127.0.0.1
+        description: Address (IP or FQDN) of the deployment server.
+      uf_deploy_server_port:
+        type: int
+        default: 8089
+        description: Management port of the deployment server.
+      uf_forward_internal_logs_address:
+        type: str
+        default: 127.0.0.1
+        description: >-
+          Address of the indexer, heavy forwarder, or cluster manager that
+          _internal logs are forwarded to. Only a single address is supported.
+      uf_forward_internal_logs_port:
+        type: int
+        default: 9997
+        description: Receiving port on that host.

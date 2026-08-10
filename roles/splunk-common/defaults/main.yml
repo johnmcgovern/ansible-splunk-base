@@ -1,0 +1,42 @@
+---
+# Defaults shared by every role in this project.
+#
+# splunk-common is listed as a dependency in each role's meta/main.yml, so
+# these values are in scope everywhere. Override any of them in
+# group_vars/all, host_vars, or on the command line with -e.
+#
+# Because these are role defaults, a group_vars/all written for an older
+# release keeps working: anything it does not mention falls back to the
+# value here rather than failing as an undefined variable.
+
+
+# User and group that will run splunkd on the OS and own Splunk files
+os_user: splunk
+os_group: splunk
+
+# $SPLUNK_HOME paths
+splunk_home: /opt/splunk
+splunk_uf_home: /opt/splunkforwarder
+splunk_base_path: /opt
+
+# Process management for Splunk boot-start.
+#   systemd - 7.2.2 or later required.
+#   initd   - Supported on any version, but no Workload Management support.
+install_method: systemd
+
+# Whether to download the tgz installer from Splunk (true), or upload it from
+# the ./files/ directory of this project (false).
+download_tgz_from_splunk_servers: true
+download_uf_tgz_from_splunk_servers: true
+
+# Full .tgz download URL from splunk.com. Version, filename, and sha512
+# checksum are derived from it. Empty means fall back to the legacy
+# splunk_version + splunk_tgz + splunk_tgz_checksum variables.
+splunk_download_url: ""
+splunk_uf_download_url: ""
+
+# Optional pinned checksum, overriding the sha512 published by Splunk.
+# Accepts "sha512:<hash>", "sha256:<hash>", or "md5:<hash>"; a bare hash is
+# treated as md5 for backward compatibility.
+splunk_tgz_checksum: ""
+splunk_uf_tgz_checksum: ""

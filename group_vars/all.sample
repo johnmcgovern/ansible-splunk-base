@@ -1,153 +1,133 @@
 
-# ========================================
+# ============================================================
 #  Ansible, OS, & Splunk Config Variables
-# ========================================
-
+# ============================================================
 #
-# Change These:
-# (Username / password type variables that should be changed)
+# This file holds the settings you must choose: how to reach the hosts, the
+# Splunk credentials to seed, and which Splunk release to install.
 #
+# Everything else has a default that lives with the role that uses it, so you
+# only list a setting here when you want to change it:
+#
+#   roles/splunk-common/defaults/main.yml  - paths, os user/group, install
+#                                            method, download behaviour
+#   roles/core-install/defaults/main.yml   - update checks, alert email domains
+#   roles/core-upgrade/defaults/main.yml   - stale file removal
+#   roles/uf-config/defaults/main.yml      - deployment server, outputs
+#
+# Each role also documents its variables in meta/argument_specs.yml, and
+# validates them before running, so a typo fails immediately with a clear
+# message instead of part way through a play.
 
-# Remote host username, password, enable password, and SSH private key file (default method)
-#   If one of ssh_pass, become_pass (sudo), and private_key are not needed,
-#   comment them out based on your authentication method.
+
+# ============================================================
+#  Connection
+# ============================================================
+
+# Remote host username, password, sudo password, and SSH private key.
+# Comment out whichever your authentication method does not need.
 ansible_user: ubuntu
 # ansible_ssh_pass: samplePassword
 # ansible_become_pass: samplePassword
 ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 
-# Username and password for Splunk Enterprise admin user
-#   (modified during initial install, not during upgrade)
+# ansible_port: 22
+
+
+# ============================================================
+#  Splunk Credentials
+# ============================================================
+#
+# Seeded through user-seed.conf on first install only; changing them here
+# does not change the password of an instance that is already running.
+#
+# These are secrets. To keep them out of plain text, put them in an encrypted
+# file and run with --ask-vault-pass:
+#
+#   ansible-vault create group_vars/all_secrets.yml
+#
+# Username and password for the Splunk Enterprise admin user
 splunk_user: admin
 splunk_pass: splunk123
 
-# Username and password for Splunk Universal Forwarder admin user
-#   (modified during initial install, not during upgrade)
+# Username and password for the Splunk Universal Forwarder admin user
 splunk_uf_user: ufadmin
 splunk_uf_pass: splunk123
 
 
-#
-# Splunk Installation & OS Level Defaults
-# (The variables are reasonable defaults and can be safely left alone)
-#
-
-# Whether to download (wget) the tgz installer from Splunk (true, default)
-#   or upload the tgz from the ./files/ directory of this project (false).
-#   For the upload method, place the tgz in ./files/ — its filename must match
-#   the basename of the download URL (or the legacy splunk_tgz variable).
-download_tgz_from_splunk_servers: true
-download_uf_tgz_from_splunk_servers: true
-
-# Ansible connection defaults
-ansible_connection: smart
-ansible_port: 22
-
-# User and group that will run splunkd on the OS and own Splunk files
-os_user: splunk
-os_group: splunk
-
-# $SPLUNK_HOME path
-splunk_home: /opt/splunk
-splunk_uf_home: /opt/splunkforwarder
-splunk_base_path: /opt
-
-
-#
-# Splunk Configuration Settings
-# (These settings impact how Splunk is initially configured.)
-#
-
-# Allow Splunk to check for updates?
-# (true (default) or false)
-check_for_updates: true
-
-# Domains that Splunk is allowed to send alert emails to (allowedDomainList in
-# alert_actions.conf). Left unset, Splunk shows a security warning in the UI
-# because alerts could be emailed to any domain. Set one or more domains to
-# restrict it, for example:
-#
-#   splunk_email_allowed_domains:
-#     - example.com
-#     - subsidiary.example.com
-#
-# An empty list (the default) leaves the setting unmanaged.
-splunk_email_allowed_domains: []
-
-# Remove files that a previous Splunk release shipped and the current release
-# no longer ships (old python, mongod and library versions). Extracting the tgz
-# over $SPLUNK_HOME cannot remove them, so Splunk's file integrity check reports
-# them as "present_but_shouldnt_be" after every upgrade.
-#
-# A file is removed only when the previous release's manifest lists it, the
-# current release's manifest does not, and it is still on disk - so files that
-# Splunk never shipped are never touched. Removal is scoped to the top level of
-# bin/ and lib/, which is what Splunk's own check reports.
-#
-# Defaults to false because it deletes files under $SPLUNK_HOME. Set it to true
-# to have upgrade.yml tidy up; it also cleans a host that is already at the
-# target version. Run upgrade.yml with --check first to list what would go.
-splunk_remove_stale_files: false
-
-
-#
-# Universal Forwarder Configuration Settings
-# (These settings impact how the UF is configured in uf-config.yml.)
-#
-
-# -UF DS- The address of the deployment server (IP or FQDN).
-uf_deploy_server_address: 127.0.0.1
-
-# -UF DS- The port of the deployment server (defaults to 8089).
-uf_deploy_server_port: 8089
-
-# -UF Outputs- The address of the indexer, heavy forwarder, or cluster master (FQDN or IP) for outputs.conf.
-# Currently, only a single address is supported.
-uf_forward_internal_logs_address: 127.0.0.1
-
-# -UF Outputs- The address of the indexer, heavy forwarder, or cluster master's receiving port for outputs.conf
-uf_forward_internal_logs_port: 9997
-
-
-
-# =========================================
+# ============================================================
 #  Splunk Version Selection (URL-first)
-# =========================================
+# ============================================================
 #
-# Paste the full .tgz download URL from splunk.com for the version you want.
-# The version number, filename, and checksum (sha512, fetched from
-# download.splunk.com alongside the tgz) are all derived automatically —
-# any past or future Splunk version works with no changes to this project.
+# Paste the full .tgz download URL for the version you want. The version
+# number, filename, and sha512 checksum are all derived from it, so any past
+# or future Splunk release works with no changes to this project.
 #
 #   Splunk Enterprise:    https://www.splunk.com/en_us/download/splunk-enterprise.html
 #   Universal Forwarder:  https://www.splunk.com/en_us/download/universal-forwarder.html
 #   Older releases:       https://www.splunk.com/en_us/download/previous-releases.html
 #
-# (On the download page, copy the "wget" / direct download link for
+# (On the download page, copy the "wget" / direct download link for the
 #  Linux .tgz, x86_64/amd64.)
 
 splunk_download_url: https://download.splunk.com/products/splunk/releases/10.4.2/linux/splunk-10.4.2-33c3bf42cd73-linux-amd64.tgz
 
 splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/releases/10.4.2/linux/splunkforwarder-10.4.2-33c3bf42cd73-linux-amd64.tgz
 
-# Optional: pin a specific checksum instead of trusting the one published on
-# the Splunk CDN. Accepts "md5:<hash>", "sha256:<hash>", or "sha512:<hash>".
-# A bare hash (no prefix) is treated as md5 for backward compatibility.
-# splunk_tgz_checksum: sha512:2e62660f31849cfac6cb4e14a7a7c98f4be3fb4e72040ef87d9674a3ba7d3857ae4e3edabc1122ba318e707dcd3d9a4ba91e5f7737776ce2e6a11fc808e11f9e
-# splunk_uf_tgz_checksum: sha512:...
 
-# Installation method (pick one):
-# systemd - 7.2.2 or later required.
-# initd - Supported on any version, but no Workload Management support.
-install_method: systemd
-
-
+# ============================================================
+#  Common Overrides
+# ============================================================
 #
-# Legacy version selection (still supported)
+# Shown with their defaults. Uncomment only what you want to change.
+
+# Process management for Splunk boot-start.
+#   systemd - 7.2.2 or later required.
+#   initd   - Supported on any version, but no Workload Management support.
+# install_method: systemd
+
+# Upload the installer from this project's files/ directory instead of
+# downloading it from Splunk (for air-gapped environments).
+# download_tgz_from_splunk_servers: true
+# download_uf_tgz_from_splunk_servers: true
+
+# Pin a checksum instead of trusting the sha512 published alongside the tgz.
+# Accepts "sha512:<hash>", "sha256:<hash>", or "md5:<hash>".
+# splunk_tgz_checksum: ""
+
+# Domains Splunk may send alert emails to. Leaving this empty is what makes
+# Splunk warn about allowedDomainList in the UI.
+# splunk_email_allowed_domains:
+#   - example.com
+
+# On upgrade, remove files the previous release shipped that the current one
+# does not. Run upgrade.yml with --check first to see what would go.
+# splunk_remove_stale_files: false
+
+# Allow Splunk to check for updates.
+# check_for_updates: true
+
+# Universal Forwarder: deployment server and where to forward _internal logs.
+# uf_deploy_server_address: 127.0.0.1
+# uf_deploy_server_port: 8089
+# uf_forward_internal_logs_address: 127.0.0.1
+# uf_forward_internal_logs_port: 9997
+
+# Paths and the OS account that owns them.
+# os_user: splunk
+# os_group: splunk
+# splunk_home: /opt/splunk
+# splunk_uf_home: /opt/splunkforwarder
+# splunk_base_path: /opt
+
+
+# ============================================================
+#  Legacy Version Selection (still supported)
+# ============================================================
 #
 # If splunk_download_url / splunk_uf_download_url are not set, the older
-# three-variable form is used instead, exactly as in previous releases of
-# this project. If you use this form, do not set the URL variables above.
+# three-variable form is used instead, exactly as in previous releases. If you
+# use this form, do not set the URL variables above.
 #
 # splunk_version: 9.4.2
 # splunk_tgz: splunk-9.4.2-e9664af3d956-linux-amd64.tgz

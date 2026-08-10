@@ -1,0 +1,10 @@
+---
+# -UF DS- Address and port of the deployment server.
+uf_deploy_server_address: 127.0.0.1
+uf_deploy_server_port: 8089
+
+# -UF Outputs- Address and receiving port of the indexer, heavy forwarder, or
+# cluster manager that _internal logs are forwarded to. Currently only a
+# single address is supported.
+uf_forward_internal_logs_address: 127.0.0.1
+uf_forward_internal_logs_port: 9997

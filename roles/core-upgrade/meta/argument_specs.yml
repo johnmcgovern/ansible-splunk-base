@@ -1,0 +1,26 @@
+---
+argument_specs:
+
+  main:
+    short_description: Upgrade Splunk Enterprise (Core)
+    description:
+      - >-
+        Extracts the target release over $SPLUNK_HOME, rebuilds boot-start,
+        and restarts Splunk.
+      - >-
+        Does nothing when etc/splunk.version already reports the target
+        version, so the playbook is safe to re-run.
+      - See the splunk-common role for the shared variables this role also uses.
+    options:
+      splunk_remove_stale_files:
+        type: bool
+        default: false
+        description:
+          - >-
+            Remove files a previous release shipped that the current release
+            does not - old python, mongod and library versions that extracting
+            the tarball cannot clear, and which Splunk's file integrity check
+            reports as "present_but_shouldnt_be".
+          - >-
+            Defaults to false because it deletes files under $SPLUNK_HOME. Run
+            upgrade.yml with --check first to list exactly what would go.

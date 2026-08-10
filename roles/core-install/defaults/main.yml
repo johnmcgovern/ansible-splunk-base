@@ -1,0 +1,13 @@
+---
+# Allow Splunk to check for updates?
+check_for_updates: true
+
+# Domains Splunk may send alert emails to (allowedDomainList in
+# alert_actions.conf). An empty list leaves the setting unmanaged, which is
+# what Splunk warns about in the UI.
+splunk_email_allowed_domains: []
+
+# Note: splunk_user and splunk_pass are deliberately not defaulted. They are
+# credentials, so they must be set explicitly in group_vars/all - the role
+# argument spec rejects a run without them rather than seeding a password
+# nobody chose.

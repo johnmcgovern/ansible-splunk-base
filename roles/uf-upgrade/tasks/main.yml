@@ -1,5 +1,10 @@
 ---
 
+- name: Resolve the Splunk download URL, version, and checksum
+  ansible.builtin.include_role:
+    name: splunk-common
+    tasks_from: resolve-version
+
 - name: Check for an existing Universal Forwarder install
   ansible.builtin.stat:
     path: "{{ splunk_uf_home }}/etc/splunk.version"

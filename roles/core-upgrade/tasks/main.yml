@@ -1,5 +1,10 @@
 ---
 
+- name: Resolve the Splunk download URL, version, and checksum
+  ansible.builtin.include_role:
+    name: splunk-common
+    tasks_from: resolve-version
+
 - name: Check for an existing Splunk install
   ansible.builtin.stat:
     path: "{{ splunk_home }}/etc/splunk.version"
@@ -148,7 +153,7 @@
 # Removal is scoped to the top level of bin/ and lib/, matching what Splunk's
 # integrity check reports. Run with --check first to list what would go.
 - name: Remove files left behind by a previous Splunk release
-  when: splunk_remove_stale_files | default(false) | bool
+  when: splunk_remove_stale_files | bool
   block:
 
     - name: -stale files- Find Splunk manifests in {{ splunk_home }}

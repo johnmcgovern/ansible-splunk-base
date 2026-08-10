@@ -1,0 +1,121 @@
+---
+argument_specs:
+
+  main:
+    short_description: Shared variables, handlers, and installer helpers
+    description:
+      - Depended on by every other role in this project.
+      - >-
+        Carries the variables and handlers they share, and validates those
+        variables once, before any task runs.
+    options:
+      os_user:
+        type: str
+        default: splunk
+        description: OS account that owns $SPLUNK_HOME and runs splunkd.
+      os_group:
+        type: str
+        default: splunk
+        description: Primary group for os_user.
+      splunk_home:
+        type: path
+        default: /opt/splunk
+        description: $SPLUNK_HOME for Splunk Enterprise.
+      splunk_uf_home:
+        type: path
+        default: /opt/splunkforwarder
+        description: $SPLUNK_HOME for the Universal Forwarder.
+      splunk_base_path:
+        type: path
+        default: /opt
+        description: >-
+          Directory the installer tarball is extracted into. The tarball
+          creates its own splunk/ or splunkforwarder/ directory beneath it.
+      install_method:
+        type: str
+        default: systemd
+        choices:
+          - systemd
+          - initd
+        description:
+          - Process manager that Splunk boot-start is configured for.
+          - >-
+            Validated because a typo here used to be silent: every boot-start
+            and start task is guarded on this value, so a misspelling skipped
+            all of them and left an installed but never-started Splunk behind
+            a successful play.
+      download_tgz_from_splunk_servers:
+        type: bool
+        default: true
+        description: >-
+          Download the Splunk Enterprise installer from Splunk (true), or
+          upload it from this project's files/ directory (false).
+      download_uf_tgz_from_splunk_servers:
+        type: bool
+        default: true
+        description: Same as above, for the Universal Forwarder installer.
+      splunk_download_url:
+        type: str
+        default: ""
+        description:
+          - Full .tgz download URL for Splunk Enterprise, copied from splunk.com.
+          - >-
+            Version, filename, and sha512 checksum are derived from it. Empty
+            falls back to the legacy splunk_version, splunk_tgz and
+            splunk_tgz_checksum variables.
+      splunk_uf_download_url:
+        type: str
+        default: ""
+        description: Same as above, for the Universal Forwarder.
+      splunk_tgz_checksum:
+        type: str
+        default: ""
+        description: >-
+          Optional pinned checksum overriding the sha512 Splunk publishes.
+          Accepts "sha512:<hash>", "sha256:<hash>" or "md5:<hash>"; a bare hash
+          is treated as md5 for backward compatibility.
+      splunk_uf_tgz_checksum:
+        type: str
+        default: ""
+        description: Same as above, for the Universal Forwarder.
+
+  resolve-version:
+    short_description: Derive installer version, filename, and checksum
+    description:
+      - >-
+        Sets splunk_tgz, splunk_version, splunk_tgz_url and
+        splunk_tgz_checksum_resolved (and the UF equivalents) from whichever
+        of the URL-first or legacy variable forms is in use.
+
+  fetch-tgz:
+    short_description: Download or upload a Splunk installer tarball
+    description:
+      - >-
+        Places the installer in the os_user home directory unless it is
+        already there. Callers pass the options below explicitly.
+    options:
+      splunk_fetch_tgz:
+        type: str
+        required: true
+        description: Installer filename.
+      splunk_fetch_url:
+        type: str
+        required: true
+        description: Full download URL for the installer.
+      splunk_fetch_checksum:
+        type: str
+        required: true
+        description: >-
+          "<algorithm>:<hash or URL>" passed to get_url, or an empty string to
+          skip verification.
+      splunk_fetch_download:
+        type: bool
+        required: true
+        description: Download from Splunk (true) or upload from files/ (false).
+
+  systemd-unit-fixes:
+    short_description: Patch the generated Splunkd.service unit for Ubuntu
+    description:
+      - >-
+        Removes the /init.scope reference and flattens the cgroup path, then
+        reloads systemd only if the unit actually changed.

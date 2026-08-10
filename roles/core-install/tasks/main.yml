@@ -1,5 +1,10 @@
 ---
 
+- name: Resolve the Splunk download URL, version, and checksum
+  ansible.builtin.include_role:
+    name: splunk-common
+    tasks_from: resolve-version
+
 - name: Add "{{ os_group }}" group
   ansible.builtin.group:
     name: "{{ os_group }}"
@@ -159,17 +164,24 @@
     # 0600 to match the mode Splunk uses for the local .conf files it writes.
     mode: '0600'
   become: true
-  when: splunk_email_allowed_domains | default([]) | length > 0
+  when: splunk_email_allowed_domains | length > 0
   notify: restart splunk
 
+# A bare string is accepted as well as a list. Jinja's join() iterates a string
+# character by character, so joining "example.com" directly would write
+# "allowedDomainList = e,x,a,m,p,l,e,.,c,o,m" - wrap it first.
 - name: -alert_actions.conf- Restrict alert email recipients to allowed domains
+  vars:
+    allowed_domains: >-
+      {{ [splunk_email_allowed_domains] if splunk_email_allowed_domains is string
+         else splunk_email_allowed_domains }}
   ansible.builtin.lineinfile:
     path: "{{ splunk_home }}/etc/system/local/alert_actions.conf"
     regexp: '^allowedDomainList\s*='
     insertafter: '^\[email\]'
-    line: "allowedDomainList = {{ splunk_email_allowed_domains | default([]) | join(',') }}"
+    line: "allowedDomainList = {{ allowed_domains | join(',') }}"
   become: true
-  when: splunk_email_allowed_domains | default([]) | length > 0
+  when: splunk_email_allowed_domains | length > 0
   notify: restart splunk
 
 - name: Set {{ splunk_home }} owner & group recursively  # noqa: no-handler
