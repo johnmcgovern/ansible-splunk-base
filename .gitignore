@@ -119,3 +119,6 @@ files/*
 
 certs/*
 !certs/README.md
+
+# Local handoff notes (names lab hosts; repo is public)
+HANDOFF.md
