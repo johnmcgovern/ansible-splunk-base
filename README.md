@@ -234,6 +234,17 @@ This role has been tested on:
 - CentOS 7 1810
 - Amazon Linux 2 2022.06 & 2020.04
 
+Most recently verified against Splunk 10.4.2:
+
+- Ubuntu 26.04 - Splunk Enterprise. os-config, install, combo, upgrade
+  (9.4.2 to 10.4.2, including stale file removal), tls-config, backup-etc.
+- Ubuntu 22.04 - Universal Forwarder. uf-install, uf-config, uf-upgrade
+  (9.4.2 to 10.4.2), forwarding to a 10.4.2 indexer and confirmed searchable
+  there.
+
+The remaining platforms were tested against earlier Splunk releases and have
+not been re-checked since.
+
 
 ### Notes
 
