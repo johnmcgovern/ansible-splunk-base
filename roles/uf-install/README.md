@@ -17,16 +17,19 @@ the admin password of a running forwarder.
 | --- | --- | --- |
 | `splunk_uf_user` | *(required)* | Forwarder admin username, seeded on first install |
 | `splunk_uf_pass` | *(required)* | Forwarder admin password, seeded on first install |
-| `uf_install_method` | `initd` | `initd` or `systemd` (see below) |
+| `uf_install_method` | `systemd` | `systemd` or `initd` (see below) |
 
 Plus the shared variables from `splunk-common`.
 
 ## Process management
 
-`uf_install_method` is deliberately separate from `install_method`, and
-defaults to `initd` because that is what this role has always done. Setting it
-to `systemd` manages the forwarder through `SplunkForwarder.service`, with the
-same Ubuntu unit-file fixes the Enterprise path uses.
+`uf_install_method` is separate from `install_method`, so a forwarder and an
+indexer can be managed differently.
 
-> **Untested:** unlike the Enterprise path, UF systemd management has not yet
-> been exercised against a real forwarder. Test it before relying on it.
+It defaults to `systemd`, which is what this role has effectively produced for
+years: earlier releases ran `enable boot-start -user <user>` with no
+`-systemd-managed` flag, and modern Splunk defaults that to systemd. The tasks
+were labelled "initd" but created `SplunkForwarder.service`.
+
+Setting it to `initd` passes `-systemd-managed 0`, which is required to get a
+real `/etc/init.d/splunk` script.

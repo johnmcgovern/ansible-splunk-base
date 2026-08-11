@@ -24,13 +24,16 @@ splunk_base_path: /opt
 #   initd   - Supported on any version, but no Workload Management support.
 install_method: systemd
 
-# Process management for the Universal Forwarder.
+# Process management for the Universal Forwarder. Separate from
+# install_method so a forwarder and an indexer can differ.
 #
-# Deliberately a separate variable, defaulting to initd: that is what the UF
-# roles have always done, and unlike the Enterprise path the systemd path here
-# has not yet been exercised against a real forwarder. Set it to systemd to
-# manage the forwarder through SplunkForwarder.service instead.
-uf_install_method: initd
+# Defaults to systemd because that is what this project has actually been
+# producing: earlier releases ran "enable boot-start -user <user>" with no
+# -systemd-managed flag, and modern Splunk defaults that to systemd, so the
+# tasks labelled "initd" have been creating SplunkForwarder.service for years.
+# Set this to initd to get a real init script - that path now passes
+# -systemd-managed 0 explicitly, as the Splunk Enterprise role always has.
+uf_install_method: systemd
 
 # Whether to download the tgz installer from Splunk (true), or upload it from
 # the ./files/ directory of this project (false).

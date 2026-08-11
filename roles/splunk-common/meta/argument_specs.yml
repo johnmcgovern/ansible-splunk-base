@@ -46,17 +46,22 @@ argument_specs:
             a successful play.
       uf_install_method:
         type: str
-        default: initd
+        default: systemd
         choices:
           - systemd
           - initd
         description:
           - Process manager that Universal Forwarder boot-start is configured for.
           - >-
-            Separate from install_method and defaulting to initd, because that
-            is what the UF roles have always done and, unlike the Enterprise
-            path, the systemd path here has not yet been exercised against a
-            real forwarder.
+            Separate from install_method so a forwarder and an indexer can
+            differ. Defaults to systemd because that is what this project has
+            actually produced for years: earlier releases ran "enable
+            boot-start" with no -systemd-managed flag, which modern Splunk
+            defaults to systemd, so the tasks labelled "initd" were creating
+            SplunkForwarder.service.
+          - >-
+            Setting it to initd now passes -systemd-managed 0 explicitly, which
+            is required to get a real init script.
       download_tgz_from_splunk_servers:
         type: bool
         default: true

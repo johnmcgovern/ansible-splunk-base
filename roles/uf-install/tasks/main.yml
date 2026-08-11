@@ -79,11 +79,14 @@
   when: splunk_uf_extracted is changed
 
 
+# -systemd-managed 0 is required to actually get an init script: without it,
+# modern Splunk generates a systemd unit instead and /etc/init.d/splunk is
+# never created.
 - name: -initd- Splunk enable boot-start
   ansible.builtin.command:
     cmd: >-
-      {{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }}
-      --no-prompt --answer-yes --accept-license
+      {{ splunk_uf_home }}/bin/splunk enable boot-start -systemd-managed 0
+      -user {{ os_user }} --no-prompt --answer-yes --accept-license
     creates: /etc/init.d/splunk
   become: true
   when: uf_install_method == "initd"

@@ -112,6 +112,35 @@
       become: true
       when: install_method == "systemd"
 
+
+# Outside the version guard on purpose. An upgrade interrupted after the
+# tarball is extracted leaves Splunk stopped, and every later run would skip
+# the block above because the installed version already matches - so the role
+# has to converge on "running", not just "installed".
+- name: -systemd- Ensure Splunk is running
+  ansible.builtin.systemd_service:
+    name: Splunkd
+    state: started
+    enabled: true
+  become: true
+  when: install_method == "systemd"
+
+- name: -initd- Check whether Splunk is running
+  ansible.builtin.command: "{{ splunk_home }}/bin/splunk status"
+  register: splunk_final_status
+  changed_when: false
+  failed_when: false
+  become: true
+  when: install_method == "initd"
+
+- name: -initd- Ensure Splunk is running
+  ansible.builtin.command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes"
+  become: true
+  when:
+    - install_method == "initd"
+    - "'is running' not in splunk_final_status.stdout | default('')"
+  changed_when: true
+
 # Upgrading by extracting the tgz over $SPLUNK_HOME replaces the files the new
 # release ships, but leaves behind any file the new release dropped - old
 # python, mongod and library versions. Splunk's own file integrity check then

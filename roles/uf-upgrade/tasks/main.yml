@@ -88,10 +88,23 @@
         recurse: true
       become: true
 
+    # "enable boot-start" refuses to overwrite an existing unit file or init
+    # script: "A systemd unit file already exists at path=... run 'splunk
+    # disable boot-start' before running this command." The Splunk Enterprise
+    # upgrade has always cleared it first; this does the same.
+    - name: Remove the existing boot-start configuration before rebuilding it
+      ansible.builtin.command: >-
+        {{ splunk_uf_home }}/bin/splunk disable boot-start
+        --no-prompt --answer-yes --accept-license
+      become: true
+      changed_when: true
+
+    # -systemd-managed 0 is required to actually get an init script: without
+    # it, modern Splunk generates a systemd unit instead.
     - name: -initd- Splunk enable boot-start
       ansible.builtin.command: >-
-        {{ splunk_uf_home }}/bin/splunk enable boot-start -user {{ os_user }}
-        --no-prompt --answer-yes --accept-license
+        {{ splunk_uf_home }}/bin/splunk enable boot-start -systemd-managed 0
+        -user {{ os_user }} --no-prompt --answer-yes --accept-license
       become: true
       when: uf_install_method == "initd"
       changed_when: true
@@ -134,3 +147,32 @@
         owner: "{{ os_user }}"
         group: "{{ os_group }}"
       become: true
+
+
+# Outside the version guard on purpose. An upgrade interrupted after the
+# tarball is extracted leaves the forwarder stopped, and every later run would
+# skip the block above because the installed version already matches - so the
+# role has to converge on "running", not just "installed".
+- name: -systemd- Ensure the Splunk Universal Forwarder is running
+  ansible.builtin.systemd_service:
+    name: SplunkForwarder
+    state: started
+    enabled: true
+  become: true
+  when: uf_install_method == "systemd"
+
+- name: -initd- Check whether the Universal Forwarder is running
+  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk status"
+  register: splunk_uf_final_status
+  changed_when: false
+  failed_when: false
+  become: true
+  when: uf_install_method == "initd"
+
+- name: -initd- Ensure the Splunk Universal Forwarder is running
+  ansible.builtin.command: "{{ splunk_uf_home }}/bin/splunk start --no-prompt --answer-yes --accept-license"
+  become: true
+  when:
+    - uf_install_method == "initd"
+    - "'is running' not in splunk_uf_final_status.stdout | default('')"
+  changed_when: true

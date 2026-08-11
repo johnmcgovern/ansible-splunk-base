@@ -14,5 +14,5 @@ the installed version already matches the target.
 Takes the shared variables from `splunk-common`, in particular
 `splunk_uf_download_url` and `uf_install_method`.
 
-> **Untested:** the UF systemd path (`uf_install_method: systemd`) has not yet
-> been exercised against a real forwarder. Test it before relying on it.
+`uf_install_method` defaults to `systemd`; set it to `initd` for a real init
+script.

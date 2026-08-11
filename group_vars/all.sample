@@ -48,10 +48,17 @@ ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 # Seeded through user-seed.conf on first install only; changing them here
 # does not change the password of an instance that is already running.
 #
-# These are secrets. To keep them out of plain text, put them in an encrypted
-# file and run with --ask-vault-pass:
+# These are secrets. To keep them out of plain text, turn group_vars/all into
+# a directory and put them in an encrypted file beside this one:
 #
-#   ansible-vault create group_vars/all_secrets.yml
+#   mkdir group_vars/all.tmp
+#   mv group_vars/all group_vars/all.tmp/vars.yml
+#   mv group_vars/all.tmp group_vars/all
+#   ansible-vault create group_vars/all/vault.yml
+#
+# then run with --ask-vault-pass. See the README for the full walkthrough.
+# Note that a file named group_vars/all_secrets.yml is NOT read - Ansible
+# treats it as variables for a group called "all_secrets".
 #
 # Username and password for the Splunk Enterprise admin user
 splunk_user: admin
@@ -93,11 +100,12 @@ splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/
 #   initd   - Supported on any version, but no Workload Management support.
 # install_method: systemd
 
-# Process management for the Universal Forwarder. Separate from
-# install_method, and defaults to initd because that is what the UF roles have
-# always done. The systemd path has not yet been exercised against a real
-# forwarder, so test it before relying on it.
-# uf_install_method: initd
+# Process management for the Universal Forwarder, separate from
+# install_method. Defaults to systemd, which is what earlier releases actually
+# produced (they ran "enable boot-start" with no -systemd-managed flag, and
+# modern Splunk defaults that to systemd). Set it to initd for a real init
+# script.
+# uf_install_method: systemd
 
 # Update every OS package as part of os-config (apt dist-upgrade, or dnf
 # update on RedHat-family hosts). Opt-in: releases before this one always
