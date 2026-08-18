@@ -5,6 +5,27 @@ All notable changes to this project are documented here.
 This project had no releases before 2.0.0. Everything prior to it is referred
 to as 1.x for convenience.
 
+## [Unreleased]
+
+### Fixed
+
+- RedHat-family tasks were gated on `ansible_distribution == 'Red Hat
+  Enterprise Linux'`, but that fact reports `RedHat`, so the OS package update
+  and the polkit installation never ran on RHEL, CentOS, or Amazon Linux - and
+  would not have run on Rocky or Alma either. They are now gated on
+  `ansible_os_family == 'RedHat'`, which covers all of them. (Latent since long
+  before 2.0.0; found during live RHEL 9.7 testing.)
+- The polkit install is now skipped when polkit is already present. It ships by
+  default on the RedHat family, and `package: state=present` still refreshes
+  dnf metadata, which failed on a host with no repo access even though nothing
+  needed installing.
+
+### Verified
+
+- Splunk Enterprise on RHEL 9.7 with SELinux enforcing and firewalld active:
+  os-config opens tcp/8000 through firewalld, and install runs with no SELinux
+  denials. Both converge to `changed=0` on a repeat run.
+
 ## [2.0.0] - 2026-08-10
 
 A modernization release. Splunk version selection no longer depends on a list

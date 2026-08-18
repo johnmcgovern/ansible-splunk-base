@@ -35,14 +35,24 @@
     - splunk_version is version('7.3', '>=')
     - splunk_version is version('8.1.1', '<')
 
-- name: -systemd & Splunk 8.1.1 polkit- Install "polkit" for 8.1.1 or later on CentOS, RHEL, and Amazon Linux
+# Only install when missing: polkit ships by default on the RedHat family, and
+# "package: state=present" still refreshes dnf metadata, which fails on a host
+# with no repo access even though polkit is already there.
+- name: -systemd & Splunk 8.1.1 polkit- Gather installed packages
+  ansible.builtin.package_facts:
+  when:
+    - splunk_version is version('8.1.1', '>=')
+    - ansible_facts['os_family'] == 'RedHat'
+
+- name: -systemd & Splunk 8.1.1 polkit- Install "polkit" for 8.1.1 or later on the RedHat family
   ansible.builtin.package:
     name: polkit
     state: present
   become: true
   when:
     - splunk_version is version('8.1.1', '>=')
-    - ansible_facts['distribution'] in ['CentOS', 'Red Hat Enterprise Linux', 'Amazon']
+    - ansible_facts['os_family'] == 'RedHat'
+    - "'polkit' not in ansible_facts.packages"
 
 - name: -systemd & Splunk 8.1.1 or later- Splunk enable boot-start (-systemd-managed 1) (-create-polkit-rules 1)
   ansible.builtin.command:

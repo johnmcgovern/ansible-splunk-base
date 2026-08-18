@@ -143,14 +143,14 @@
     - ansible_facts['distribution'] == "Ubuntu"
 
 
-- name: -RedHat, CentOS, and Amazon Linux- Yum/DNF OS Package Updates  # noqa: package-latest
+- name: -RedHat family- Yum/DNF OS Package Updates  # noqa: package-latest
   ansible.builtin.package:
     name: "*"
     state: latest
   become: true
   when:
     - os_update_packages | bool
-    - ansible_facts['distribution'] in ['CentOS', 'Red Hat Enterprise Linux', 'Amazon']
+    - ansible_facts['os_family'] == 'RedHat'
 
 
 - name: -PolicyKit- Install PolicyKit using apt-get (supported in 8.1.1)
@@ -160,9 +160,19 @@
   become: true
   when: ansible_facts['distribution'] == "Ubuntu"
 
+# Gather installed packages so polkit is only installed when actually missing.
+# On the RedHat family polkit ships by default, and "package: state=present"
+# still refreshes dnf metadata - which fails on a host with no repo access
+# (air-gapped, or an unsubscribed lab box) even though nothing needs installing.
+- name: -PolicyKit- Gather installed packages
+  ansible.builtin.package_facts:
+  when: ansible_facts['os_family'] == 'RedHat'
+
 - name: -PolicyKit- Install PolicyKit using yum/dnf (supported in 8.1.1)
   ansible.builtin.package:
     name: polkit
     state: present
   become: true
-  when: ansible_facts['distribution'] == 'CentOS' or ansible_facts['distribution'] == 'Red Hat Enterprise Linux' or ansible_facts['distribution'] == 'Amazon'
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - "'polkit' not in ansible_facts.packages"

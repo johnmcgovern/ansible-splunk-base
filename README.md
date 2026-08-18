@@ -241,6 +241,9 @@ Most recently verified against Splunk 10.4.2:
 - Ubuntu 22.04 - Universal Forwarder. uf-install, uf-config, uf-upgrade
   (9.4.2 to 10.4.2), forwarding to a 10.4.2 indexer and confirmed searchable
   there.
+- RHEL 9.7 - Splunk Enterprise. os-config and install, with SELinux enforcing
+  and firewalld active. os-config opens tcp/8000 through firewalld; install
+  runs under SELinux with no denials.
 
 The remaining platforms were tested against earlier Splunk releases and have
 not been re-checked since.
