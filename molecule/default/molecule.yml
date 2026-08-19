@@ -33,5 +33,16 @@ provisioner:
   name: ansible
   env:
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/roles
+  inventory:
+    group_vars:
+      all:
+        # The containers already connect as root, so declare it: root-to-root
+        # become is a no-op that Ansible skips entirely (become_allow_same_user
+        # defaults to false), which keeps the roles' `become: true` tasks from
+        # shelling out to sudo. sudo's PAM account stack is broken in the
+        # RedHat-family systemd images on GitHub's cgroup-v2 runners ("PAM
+        # account management error: ... cannot retrieve authentication info"),
+        # so skipping sudo altogether is what makes those platforms pass.
+        ansible_user: root
 verifier:
   name: ansible
