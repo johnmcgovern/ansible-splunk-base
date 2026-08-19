@@ -10,6 +10,21 @@
 #   splunk_fetch_checksum  - "<algorithm>:<hash|url>", or "" to skip verification
 #   splunk_fetch_download  - true to download from Splunk, false to upload from ./files/
 
+# ansible.builtin.unarchive shells out to tar to unpack the .tgz, and minimal
+# RHEL-family images (and some cloud images) do not ship it. Gather packages
+# first so tar is installed only when it is actually missing - this keeps the
+# run idempotent and, as with the polkit install in os-config, avoids a dnf
+# metadata refresh on a host with no repo access where tar is already present.
+- name: -TGZ- Gather installed packages (to add tar only if it is missing)
+  ansible.builtin.package_facts:
+
+- name: -TGZ- Ensure tar is installed (unarchive needs it to extract the installer)
+  ansible.builtin.package:
+    name: tar
+    state: present
+  become: true
+  when: "'tar' not in ansible_facts.packages"
+
 - name: -TGZ- Check for the presence of /home/{{ os_user }}/{{ splunk_fetch_tgz }}
   ansible.builtin.stat:
     path: /home/{{ os_user }}/{{ splunk_fetch_tgz }}

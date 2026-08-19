@@ -230,12 +230,17 @@ a meta/argument_specs.yml that Ansible validates before the role runs:
 This role has been tested on:
 
 - Ubuntu 26.04, 22.04, 20.04, & 18.04 Server (LTS)
-- RHEL 8
+- Rocky Linux 9.8 (the primary RHEL-family target)
+- RHEL 9.7 & 8
 - CentOS 7 1810
 - Amazon Linux 2 2022.06 & 2020.04
 
 Most recently verified against Splunk 10.4.2:
 
+- Rocky Linux 9.8 - Splunk Enterprise, the primary RHEL-family target. On a
+  minimal image (no `tar`), os-config, a full install of 10.4.1, and an
+  in-place upgrade to 10.4.2, through systemd boot-start with polkit rules and
+  firewalld active. The upgrade re-runs at `changed=0`.
 - Ubuntu 26.04 - Splunk Enterprise. os-config, install, combo, upgrade
   (9.4.2 to 10.4.2, including stale file removal), tls-config, backup-etc.
 - Ubuntu 22.04 - Universal Forwarder. uf-install, uf-config, uf-upgrade

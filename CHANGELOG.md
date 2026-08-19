@@ -9,6 +9,13 @@ to as 1.x for convenience.
 
 ### Fixed
 
+- The installer could not be extracted on a host without `tar`. Ansible's
+  `unarchive` shells out to `tar` to unpack the `.tgz`, and minimal RHEL-family
+  images do not ship it, so install and upgrade failed at extraction with
+  "Failed to find handler". `tar` is now installed before extraction, guarded
+  behind a package-facts check so it is added only when missing (no dnf
+  metadata refresh on a host that already has it). Found during live Rocky
+  Linux 9.8 testing.
 - RedHat-family tasks were gated on `ansible_distribution == 'Red Hat
   Enterprise Linux'`, but that fact reports `RedHat`, so the OS package update
   and the polkit installation never ran on RHEL, CentOS, or Amazon Linux - and
@@ -22,6 +29,10 @@ to as 1.x for convenience.
 
 ### Verified
 
+- Splunk Enterprise on Rocky Linux 9.8 (a minimal image, no `tar`) with
+  firewalld active: os-config, a full install of 10.4.1, and an in-place
+  upgrade to 10.4.2, all through systemd boot-start with polkit rules. The
+  upgrade re-runs at `changed=0`, and Splunk Web answers on tcp/8000.
 - Splunk Enterprise on RHEL 9.7 with SELinux enforcing and firewalld active:
   os-config opens tcp/8000 through firewalld, and install runs with no SELinux
   denials. Both converge to `changed=0` on a repeat run.
