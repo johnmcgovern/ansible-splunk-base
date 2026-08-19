@@ -248,9 +248,10 @@ Most recently verified against Splunk 10.4.2:
   firewalld active. The upgrade re-runs at `changed=0`.
 - Ubuntu 26.04 - Splunk Enterprise. os-config, install, combo, upgrade
   (9.4.2 to 10.4.2, including stale file removal), tls-config, backup-etc.
-- Ubuntu 22.04 - Universal Forwarder. uf-install, uf-config, uf-upgrade
-  (9.4.2 to 10.4.2), forwarding to a 10.4.2 indexer and confirmed searchable
-  there.
+- Ubuntu 22.04 - Universal Forwarder, systemd process management. uf-install,
+  uf-config and uf-upgrade (10.4.1 to 10.4.2), with the forwarder connecting to
+  a 10.4.2 indexer on both the receiving (9997) and deployment-server (8089)
+  ports - splunkd logs "Connected to idx". The upgrade re-runs at `changed=0`.
 - RHEL 9.7 - Splunk Enterprise. os-config and install, with SELinux enforcing
   and firewalld active. os-config opens tcp/8000 through firewalld; install
   runs under SELinux with no denials.
@@ -309,7 +310,7 @@ To run Molecule locally you need Docker:
 - This Ansible playbook does not currently handle OS-level firewall allowances for splunkd TCP ports.
 - os-config.yml no longer patches the OS unless you ask it to. Earlier releases always ran a full dist-upgrade, which could pull in a new kernel as a side effect of a config run. Set os_update_packages to true to restore that behaviour.
 - ulimits are installed as /etc/security/limits.d/99-splunk.conf rather than by replacing /etc/security/limits.conf. Hosts configured by an earlier release have the old entries removed from limits.conf on the next os-config run. Note that under systemd, splunkd takes its limits from the Splunkd.service unit; the PAM limits apply to initd startup and to interactive sessions as the splunk user.
-- The Universal Forwarder has its own uf_install_method variable, separate from install_method, and it defaults to initd. Unlike the Splunk Enterprise path, UF systemd management has not yet been exercised against a real forwarder - test it before relying on it.
+- The Universal Forwarder has its own uf_install_method variable, separate from install_method, and it defaults to systemd. The systemd forwarder path has now been verified end to end on Ubuntu 22.04 (install, config, and upgrade 10.4.1 to 10.4.2, forwarding to a real 10.4.2 indexer). The initd path remains selectable but has not been re-verified as recently.
 - We bias towards being non-destructive. For example, if we see an existing/previous Splunk install we will fail out rather than damage the current install. 
 
 ### To-Do

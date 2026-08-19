@@ -44,6 +44,11 @@ to as 1.x for convenience.
 
 ### Verified
 
+- Splunk Universal Forwarder on Ubuntu 22.04 with systemd process management -
+  the forwarder path the notes previously flagged as unexercised. uf-install,
+  uf-config and uf-upgrade (10.4.1 to 10.4.2); the forwarder connects to a
+  10.4.2 indexer on the receiving (9997) and deployment-server (8089) ports
+  (splunkd logs "Connected to idx"), and uf-upgrade re-runs at `changed=0`.
 - Splunk Enterprise on Rocky Linux 9.8 (a minimal image, no `tar`) with
   firewalld active: os-config, a full install of 10.4.1, and an in-place
   upgrade to 10.4.2, all through systemd boot-start with polkit rules. The
