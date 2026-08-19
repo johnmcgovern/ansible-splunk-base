@@ -7,6 +7,8 @@ to as 1.x for convenience.
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-08-18
+
 ### Added
 
 - Molecule + Docker CI that converges `os-config` in a container, asserts
@@ -14,6 +16,11 @@ to as 1.x for convenience.
   is installed on both OS families. It runs on every push and pull request
   across a four-distro matrix - Ubuntu 22.04 and 24.04 (both polkit branches),
   Rocky Linux 9 and Amazon Linux 2023 - and is green on all four.
+- meta/argument_specs.yml for the four roles that still lacked one -
+  tls-config, uf-upgrade, backup-etc and backup-full - so every role except
+  prereqs now validates its arguments before it runs. prereqs is the exception
+  by necessity: it bootstraps python3 (with the raw module) before argument
+  validation, itself a Python module, could run.
 
 ### Fixed
 
