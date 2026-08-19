@@ -7,6 +7,14 @@ to as 1.x for convenience.
 
 ## [Unreleased]
 
+### Added
+
+- Molecule + Docker CI that converges `os-config` in a container, asserts
+  idempotence, and verifies the files it installs are present and that polkit
+  is installed on both OS families. It runs on every push and pull request
+  across a four-distro matrix - Ubuntu 22.04 and 24.04 (both polkit branches),
+  Rocky Linux 9 and Amazon Linux 2023 - and is green on all four.
+
 ### Fixed
 
 - The installer could not be extracted on a host without `tar`. Ansible's
