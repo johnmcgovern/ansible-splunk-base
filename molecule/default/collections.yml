@@ -1,0 +1,7 @@
+---
+# Collections Molecule installs before converging. Molecule resolves this
+# relative to the scenario directory, so it is kept here rather than reusing
+# the project-root requirements.yml. It mirrors that file - keep them in step.
+collections:
+  - name: ansible.posix        # firewalld (os-config)
+  - name: community.general    # archive (backup-etc, backup-full)

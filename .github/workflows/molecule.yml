@@ -1,0 +1,50 @@
+---
+name: Molecule
+
+"on":
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  molecule:
+    name: converge & idempotence (${{ matrix.distro }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Chosen to cover every distinct branch in os-config, mapped to the
+        # families Splunk supports:
+        #   ubuntu2204     - Debian family, policykit-1 branch (< 24.04)
+        #   ubuntu2404     - Debian family, polkitd branch (>= 24.04)
+        #   rockylinux9    - RedHat family, dnf/polkit, no iptables redirect
+        #   amazonlinux2023 - RedHat family AND the iptables redirect (Amazon)
+        # rockylinux8, debian12, amazonlinux2 all reuse one of these paths and
+        # can be added here if wider coverage is wanted.
+        distro:
+          - ubuntu2204
+          - ubuntu2404
+          - rockylinux9
+          - amazonlinux2023
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Molecule and the Docker driver
+        run: pip install ansible-core molecule "molecule-plugins[docker]" docker
+
+      - name: Install the collection the Docker driver needs
+        run: ansible-galaxy collection install community.docker
+
+      - name: Converge, then re-run to confirm no changes, then verify
+        run: molecule test
+        env:
+          MOLECULE_DISTRO: ${{ matrix.distro }}

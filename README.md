@@ -254,6 +254,44 @@ The remaining platforms were tested against earlier Splunk releases and have
 not been re-checked since.
 
 
+### Testing
+
+Every push and pull request runs two GitHub Actions workflows:
+
+- **Lint** - `yamllint`, `ansible-lint` (production profile), and a syntax check
+  of every playbook.
+- **Molecule** - converges `os-config` in a container on Ubuntu 22.04, Ubuntu
+  24.04, Rocky Linux 9 and Amazon Linux 2023, re-runs it to confirm the second
+  run reports no changes, and verifies the files it installs are present and
+  that polkit is installed. This is the automated form of the manual "run it
+  twice, check for `changed=0`" check, run across distributions so every
+  OS-specific branch is exercised on every change:
+
+  | Image | Path it covers |
+  | --- | --- |
+  | ubuntu2204 | Debian family, `policykit-1` (before 24.04) |
+  | ubuntu2404 | Debian family, `polkitd` (24.04 and later) |
+  | rockylinux9 | RedHat family, dnf/polkit, no iptables redirect |
+  | amazonlinux2023 | RedHat family *and* the iptables 443-to-8000 redirect |
+
+  These four map onto the Linux families Splunk supports (Ubuntu, the
+  RHEL/CentOS/Rocky/Alma/Oracle family, and Amazon Linux) and between them
+  reach every conditional branch in `os-config`. SUSE (SLES) is on Splunk's
+  supported list but is deliberately out of scope: this project has no
+  zypper/SUSE code path, so it is not claimed and not tested.
+
+Molecule covers the roles that need no live Splunk download. The install and
+upgrade roles pull multi-gigabyte tarballs and manage a real splunkd, so they
+stay on live verification against a real host (see Compatibility above).
+
+To run Molecule locally you need Docker:
+
+		- pip install ansible-core molecule "molecule-plugins[docker]" docker
+		- ansible-galaxy collection install community.docker
+		- molecule test                        # default target (Ubuntu 22.04)
+		- MOLECULE_DISTRO=rockylinux9 molecule test
+
+
 ### Notes
 
 - The goal of this role is to quickly execute a best-practices base Splunk install/upgrade (including support for Workload Management, which is a departure from the previous install method).

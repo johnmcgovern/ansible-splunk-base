@@ -1,0 +1,37 @@
+---
+# Molecule scenario: converge os-config in a container and prove it stays
+# idempotent on a second run.
+#
+# It is deliberately small. It exercises os-config and its prereqs - the roles
+# that need no live Splunk download - because that is where the OS-fact
+# branching bugs live (e.g. the RedHat-family gating fixed in 2.0.x, which was
+# latent for years and only surfaced during a manual RHEL run). The Splunk
+# install and upgrade roles pull multi-gigabyte tarballs and manage a real
+# splunkd, so they stay on live verification and are out of scope here.
+#
+# Select the target OS with MOLECULE_DISTRO; the CI matrix in
+# .github/workflows/molecule.yml sets it. Locally:
+#
+#     MOLECULE_DISTRO=rockylinux9 molecule test
+#
+# geerlingguy's images run systemd as PID 1, which os-config needs for the
+# disable-thp unit; that is why they run privileged with the cgroup mount.
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: splunk-os-config-${MOLECULE_DISTRO:-ubuntu2204}
+    image: geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu2204}-ansible:latest
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/roles
+verifier:
+  name: ansible

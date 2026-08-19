@@ -1,0 +1,56 @@
+---
+# Molecule already asserts idempotence (a second converge with zero changes).
+# This adds outcome checks: the artifacts os-config installs are actually
+# present, and - the reason this scenario exists - polkit is installed on both
+# OS families, which is exactly what the RedHat-family gating bug broke.
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Gather installed package facts
+      ansible.builtin.package_facts:
+
+    - name: Look up the Splunk user
+      ansible.builtin.getent:
+        database: passwd
+        key: splunk
+
+    - name: Stat the files os-config installs
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: os_config_files
+      loop:
+        - /etc/security/limits.d/99-splunk.conf
+        - /usr/local/bin/disable-thp
+        - /etc/systemd/system/disable-thp.service
+      loop_control:
+        label: "{{ item }}"
+
+    - name: The Splunk user was created
+      ansible.builtin.assert:
+        that:
+          - "'splunk' in ansible_facts['getent_passwd']"
+        fail_msg: os-config did not create the splunk user
+
+    - name: The files os-config installs are all present
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+        fail_msg: "os-config did not install {{ item.item }}"
+      loop: "{{ os_config_files.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: PolicyKit is installed on the RedHat family
+      ansible.builtin.assert:
+        that:
+          - "'polkit' in ansible_facts.packages"
+        fail_msg: >-
+          polkit is not installed - the RedHat-family gating has regressed
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: PolicyKit is installed on the Debian family
+      ansible.builtin.assert:
+        that:
+          - "'polkitd' in ansible_facts.packages or 'policykit-1' in ansible_facts.packages"
+        fail_msg: polkit is not installed on this Debian-family host
+      when: ansible_facts['os_family'] == 'Debian'

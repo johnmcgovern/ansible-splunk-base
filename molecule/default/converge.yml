@@ -1,0 +1,8 @@
+---
+# Mirrors os-config.yml: the same two roles, in the same order, so the scenario
+# exercises the real entry point rather than a test-only arrangement.
+- name: Converge
+  hosts: all
+  roles:
+    - prereqs
+    - os-config
