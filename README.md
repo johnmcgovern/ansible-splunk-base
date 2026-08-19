@@ -224,6 +224,11 @@ a meta/argument_specs.yml that Ansible validates before the role runs:
 - roles/backup-etc, roles/backup-full - backups
 - roles/prereqs - python3 bootstrap
 
+prereqs is the one exception with no argument_specs.yml: it runs before python
+exists (that is what it installs, using the raw module), and argument
+validation is itself a Python module, so a spec there could not run. It takes
+no variables of its own.
+
 
 ### Compatibility
 

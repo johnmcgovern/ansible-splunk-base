@@ -1,0 +1,13 @@
+---
+argument_specs:
+
+  main:
+    short_description: Back up the Splunk configuration
+    description:
+      - >-
+        Archives $SPLUNK_HOME/etc into a timestamped tgz under the os_user home
+        directory, so each run produces a new file rather than overwriting the
+        last.
+      - >-
+        Takes no variables of its own. See the splunk-common role for the
+        shared variables this role uses.

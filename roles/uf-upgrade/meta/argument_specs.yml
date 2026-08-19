@@ -1,0 +1,18 @@
+---
+argument_specs:
+
+  main:
+    short_description: Upgrade the Splunk Universal Forwarder
+    description:
+      - >-
+        Extracts the target release over $SPLUNK_HOME, rebuilds boot-start, and
+        restarts the forwarder.
+      - >-
+        Does nothing when etc/splunk.version already reports the target
+        version, so the playbook is safe to re-run. It still converges on
+        "running", so an upgrade interrupted after extraction is recovered
+        rather than left stopped.
+      - >-
+        Honours uf_install_method (see splunk-common) to choose between initd
+        and SplunkForwarder.service.
+      - See the splunk-common role for the shared variables this role also uses.

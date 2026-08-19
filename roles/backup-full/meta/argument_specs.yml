@@ -1,0 +1,16 @@
+---
+argument_specs:
+
+  main:
+    short_description: Back up all of $SPLUNK_HOME
+    description:
+      - >-
+        Archives the whole of $SPLUNK_HOME into a timestamped tgz under the
+        os_user home directory.
+      - >-
+        Runs while splunkd is up, so hot buckets and the KV store are not
+        guaranteed to be consistent - stop Splunk first for a restore-grade
+        backup.
+      - >-
+        Takes no variables of its own. See the splunk-common role for the
+        shared variables this role uses.

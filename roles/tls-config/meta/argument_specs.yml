@@ -1,0 +1,17 @@
+---
+argument_specs:
+
+  main:
+    short_description: Install a TLS certificate for Splunk Web
+    description:
+      - >-
+        Uploads the certificate and private key from this project's certs/
+        directory into $SPLUNK_HOME/etc/auth/mycerts, points web.conf at them,
+        and enables SSL on Splunk Web (tcp/8000).
+      - >-
+        Manages only the keys it sets in web.conf, and works standalone - it
+        creates web.conf when core-install has not run on the host yet.
+      - >-
+        Takes no variables of its own: the certificate is supplied as the files
+        certs/cert.pem and certs/privkey.pem. See the splunk-common role for
+        the shared variables this role uses.
