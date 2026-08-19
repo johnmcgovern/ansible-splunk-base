@@ -1,0 +1,11 @@
+[Unit]
+Description=Redirect tcp/443 to Splunk Web on tcp/8000
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/splunk-web-redirect
+
+[Install]
+WantedBy=multi-user.target

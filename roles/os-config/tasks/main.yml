@@ -112,14 +112,38 @@
   when: firewalld_flag.stat.exists
 
 
-- name: -iptables- Redirect 443 to 8000 (Ubuntu and Amazon Linux)
-  ansible.builtin.iptables:
-    table: nat
-    chain: PREROUTING
-    protocol: tcp
-    destination_port: "443"
-    jump: REDIRECT
-    to_ports: "8000"
+# The 443-to-8000 redirect is installed as a systemd oneshot rather than a bare
+# iptables rule so it survives a reboot: a rule added here at play time is lost
+# on the next boot, but the unit re-applies it. Ubuntu and Amazon Linux only -
+# the RedHat family reaches Splunk Web on tcp/8000 opened through firewalld.
+- name: -web redirect- Install the 443-to-8000 redirect script (Ubuntu and Amazon Linux)
+  ansible.builtin.template:
+    src: splunk-web-redirect.j2
+    dest: /usr/local/bin/splunk-web-redirect
+    mode: '0754'
+  become: true
+  when: ansible_facts['distribution'] == 'Ubuntu' or ansible_facts['distribution'] == 'Amazon'
+
+- name: -web redirect- Install the 443-to-8000 redirect systemd unit
+  ansible.builtin.template:
+    src: splunk-web-redirect.service.j2
+    dest: /etc/systemd/system/splunk-web-redirect.service
+    mode: '0644'
+  become: true
+  register: splunk_web_redirect_unit
+  when: ansible_facts['distribution'] == 'Ubuntu' or ansible_facts['distribution'] == 'Amazon'
+
+- name: -web redirect- Reload the systemd daemon after a redirect unit change  # noqa: no-handler
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  become: true
+  when: splunk_web_redirect_unit is changed
+
+- name: -web redirect- Enable the redirect at boot and apply it now
+  ansible.builtin.systemd_service:
+    name: splunk-web-redirect
+    enabled: true
+    state: started
   become: true
   when: ansible_facts['distribution'] == 'Ubuntu' or ansible_facts['distribution'] == 'Amazon'
 

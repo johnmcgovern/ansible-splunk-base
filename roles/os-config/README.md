@@ -27,5 +27,7 @@ Plus the shared variables from `splunk-common`.
   interactive sessions as the Splunk user.
 - Transparent hugepages are disabled by a boot-time oneshot unit, and the
   script is run immediately only when THP is not already `never`.
-- tcp/8000 is opened through firewalld where firewalld is present, and 443 is
-  redirected to 8000 on Ubuntu and Amazon Linux.
+- tcp/8000 is opened through firewalld where firewalld is present. On Ubuntu
+  and Amazon Linux, 443 is redirected to 8000 by a boot-time oneshot unit
+  (`splunk-web-redirect.service`), so the UI stays reachable at `https://host/`
+  across reboots.

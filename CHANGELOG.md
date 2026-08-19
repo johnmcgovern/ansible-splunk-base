@@ -17,6 +17,13 @@ to as 1.x for convenience.
 
 ### Fixed
 
+- The 443-to-8000 redirect for Splunk Web (Ubuntu and Amazon Linux) did not
+  survive a reboot: it was a bare iptables rule added at play time with nothing
+  to restore it, so after a reboot `https://host/` stopped working and the UI
+  was reachable only at `https://host:8000/`. os-config now installs it as a
+  boot-time oneshot unit (`splunk-web-redirect.service`), the same way it
+  handles the THP tweak, so the redirect persists. Found when a rebooted lab
+  host lost the rule.
 - The installer could not be extracted on a host without `tar`. Ansible's
   `unarchive` shells out to `tar` to unpack the `.tgz`, and minimal RHEL-family
   images do not ship it, so install and upgrade failed at extraction with

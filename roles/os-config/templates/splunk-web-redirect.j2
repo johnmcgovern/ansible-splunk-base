@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# {{ ansible_managed }}
+#
+# Redirect inbound tcp/443 to Splunk Web on tcp/8000, so the UI is reachable at
+# https://host/ as well as https://host:8000/. Run at boot by
+# splunk-web-redirect.service so the redirect survives a reboot (an iptables
+# rule added at play time does not).
+#
+# Check-then-add, so re-running never stacks a duplicate rule.
+if ! iptables -t nat -C PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8000 2>/dev/null; then
+    iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8000
+fi
