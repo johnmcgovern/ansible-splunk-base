@@ -13,6 +13,11 @@ to as 1.x for convenience.
   in-place upgrade from 10.4.2. The README notes the one-time KV Store data
   migration that the upgrade to 10.6 triggers.
 
+### Changed
+
+- The example download URLs in group_vars/all.sample and the README now point
+  at Splunk Enterprise and Universal Forwarder 10.6.0.5 (previously 10.4.2).
+
 ### Fixed
 
 - On Ubuntu 22.04+, the unit-file fix that converts cgroup v1 paths to v2

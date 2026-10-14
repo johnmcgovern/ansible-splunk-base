@@ -60,8 +60,8 @@ Splunk version works without changes to this project.
 
 2. Set it in group_vars/all:
 
-		- splunk_download_url: https://download.splunk.com/products/splunk/releases/10.4.2/linux/splunk-10.4.2-33c3bf42cd73-linux-amd64.tgz
-		- splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/releases/10.4.2/linux/splunkforwarder-10.4.2-33c3bf42cd73-linux-amd64.tgz
+		- splunk_download_url: https://download.splunk.com/products/splunk/releases/10.6.0.5/linux/splunk-10.6.0.5-86587d4e3b27-linux-amd64.tgz
+		- splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/releases/10.6.0.5/linux/splunkforwarder-10.6.0.5-86587d4e3b27-linux-amd64.tgz
 
 The tgz checksum is verified against the sha512 published alongside it on
 download.splunk.com. To pin a checksum explicitly (e.g. for air-gapped or
