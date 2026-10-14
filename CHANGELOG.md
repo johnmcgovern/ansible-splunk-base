@@ -15,6 +15,13 @@ to as 1.x for convenience.
 
 ### Changed
 
+- `splunk_remove_stale_files` now defaults to `true`. After an in-place
+  upgrade, core-upgrade removes the files the previous release shipped and the
+  new one does not, so Splunk's file integrity check no longer warns about
+  them in the UI. The deletion list still comes only from the previous
+  release's manifest, and the play still fails if `splunk validate files`
+  reports a problem afterwards. Set it to `false` to keep the old behaviour,
+  and run upgrade.yml with `--check` to see what would be removed.
 - The example download URLs in group_vars/all.sample and the README now point
   at Splunk Enterprise and Universal Forwarder 10.6.0.5 (previously 10.4.2).
 

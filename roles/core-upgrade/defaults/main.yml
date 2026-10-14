@@ -1,5 +1,7 @@
 ---
 # Remove files a previous Splunk release shipped that the current release does
-# not. Defaults to false because it deletes files under $SPLUNK_HOME; run
-# upgrade.yml with --check first to see exactly what would go.
-splunk_remove_stale_files: false
+# not, so Splunk's file integrity check stops warning about them after an
+# upgrade. Only files listed in the previous release's manifest are candidates;
+# run upgrade.yml with --check to see exactly what would go, or set this to
+# false to leave them in place.
+splunk_remove_stale_files: true

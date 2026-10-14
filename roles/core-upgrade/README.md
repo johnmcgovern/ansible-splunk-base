@@ -15,7 +15,7 @@ twice costs one fact-gathering pass and nothing else.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `splunk_remove_stale_files` | `false` | Remove files a previous release shipped that the current one does not |
+| `splunk_remove_stale_files` | `true` | Remove files a previous release shipped that the current one does not |
 
 Plus the shared variables from `splunk-common`.
 
@@ -27,9 +27,9 @@ accumulate and Splunk's file integrity check reports them as
 `present_but_shouldnt_be`. Splunk provides no cleanup for this: `splunk clean`
 only touches data, and `splunk validate files` is report-only.
 
-Set `splunk_remove_stale_files: true` to have this role tidy them. It runs
-outside the version guard, so it also cleans a host already at the target
-version.
+This role tidies them by default (`splunk_remove_stale_files: true`); set it
+to `false` to leave them in place. It runs outside the version guard, so it
+also cleans a host already at the target version.
 
 **The deletion list is derived from the previous release's manifest, never
 from the contents of the filesystem.** A file is removed only when a previous
@@ -42,5 +42,5 @@ intact or the play fails.
 Run with `--check` first to list exactly what would go:
 
 ```bash
-ansible-playbook -i hosts upgrade.yml --check -e splunk_remove_stale_files=true
+ansible-playbook -i hosts upgrade.yml --check
 ```

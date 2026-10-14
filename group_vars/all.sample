@@ -127,8 +127,9 @@ splunk_uf_download_url: https://download.splunk.com/products/universalforwarder/
 #   - example.com
 
 # On upgrade, remove files the previous release shipped that the current one
-# does not. Run upgrade.yml with --check first to see what would go.
-# splunk_remove_stale_files: false
+# does not, which clears Splunk's file integrity warning. On by default; run
+# upgrade.yml with --check to see what would go.
+# splunk_remove_stale_files: true
 
 # Allow Splunk to check for updates.
 # check_for_updates: true

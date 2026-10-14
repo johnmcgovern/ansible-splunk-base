@@ -14,7 +14,7 @@ argument_specs:
     options:
       splunk_remove_stale_files:
         type: bool
-        default: false
+        default: true
         description:
           - >-
             Remove files a previous release shipped that the current release
@@ -22,5 +22,6 @@ argument_specs:
             the tarball cannot clear, and which Splunk's file integrity check
             reports as "present_but_shouldnt_be".
           - >-
-            Defaults to false because it deletes files under $SPLUNK_HOME. Run
-            upgrade.yml with --check first to list exactly what would go.
+            Only files listed in a previous release's manifest are candidates.
+            Run upgrade.yml with --check to list exactly what would go, or set
+            this to false to leave them in place.
