@@ -240,7 +240,14 @@ This role has been tested on:
 - CentOS 7 1810
 - Amazon Linux 2 2022.06 & 2020.04
 
-Most recently verified against Splunk 10.4.2:
+Most recently verified against Splunk 10.6.0.5:
+
+- Ubuntu 26.04 - Splunk Enterprise. A fresh install (combo) and an in-place
+  upgrade from 10.4.2, each followed by tls-config. Both re-run at
+  `changed=0`, and Splunk Web, the 443 redirect and the management port all
+  answer afterwards.
+
+Verified against Splunk 10.4.2:
 
 - Rocky Linux 9.8 - Splunk Enterprise, the primary RHEL-family target. On a
   minimal image (no `tar`), os-config, a full install of 10.4.1, and an
@@ -311,6 +318,7 @@ To run Molecule locally you need Docker:
 - os-config.yml no longer patches the OS unless you ask it to. Earlier releases always ran a full dist-upgrade, which could pull in a new kernel as a side effect of a config run. Set os_update_packages to true to restore that behaviour.
 - ulimits are installed as /etc/security/limits.d/99-splunk.conf rather than by replacing /etc/security/limits.conf. Hosts configured by an earlier release have the old entries removed from limits.conf on the next os-config run. Note that under systemd, splunkd takes its limits from the Splunkd.service unit; the PAM limits apply to initd startup and to interactive sessions as the splunk user.
 - The Universal Forwarder has its own uf_install_method variable, separate from install_method, and it defaults to systemd. The systemd forwarder path has now been verified end to end on Ubuntu 22.04 (install, config, and upgrade 10.4.1 to 10.4.2, forwarding to a real 10.4.2 indexer). The initd path remains selectable but has not been re-verified as recently.
+- Upgrading to Splunk 10.6 runs a one-time KV Store data migration on the first start. The KV store is read-only until it finishes - about a minute on a lightly used host, longer with large collections - so apps that write to it may log retries in the meantime. Splunk also logs "collection not found" errors from KVServiceClient during the migration, which were harmless in testing. The playbook returns once Splunk has started, not when the migration is done.
 - We bias towards being non-destructive. For example, if we see an existing/previous Splunk install we will fail out rather than damage the current install. 
 
 ### To-Do

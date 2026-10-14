@@ -7,10 +7,17 @@ to as 1.x for convenience.
 
 ## [Unreleased]
 
+### Added
+
+- Verified against Splunk 10.6.0.5 on Ubuntu 26.04: a fresh install, and an
+  in-place upgrade from 10.4.2. The README notes the one-time KV Store data
+  migration that the upgrade to 10.6 triggers.
+
 ### Fixed
 
 - On Ubuntu 22.04+, the unit-file fix that converts cgroup v1 paths to v2
-  also rewrote paths that were already v2 (as Splunk 10.6 generates them),
+  also rewrote paths that were already v2 (as Splunk 10.4 and later generate
+  them),
   turning `/sys/fs/cgroup/system.slice/%n` into `/sys/fs/cgroup.slice/%n`.
   The `ExecStartPost` chown then failed on every start - silently, as it is
   `-` prefixed - and Splunk ran without owning its cgroup. The fix now only
