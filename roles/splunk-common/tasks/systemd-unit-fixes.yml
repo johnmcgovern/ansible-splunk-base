@@ -19,13 +19,31 @@
   register: splunk_unit_init_scope_fix
   when: ansible_facts['distribution'] == "Ubuntu"
 
+# Older releases write cgroup v1 controller paths
+# (/sys/fs/cgroup/cpu/system.slice/%n); Ubuntu 22.04+ is cgroup v2 only, so
+# the controller directory has to go. Anchored on "/system.slice/" so a unit
+# that already carries the v2 path (Splunk 10.6+) is left alone.
 - name: -systemd & Ubuntu- Fix the cgroups path reference in the unit file (Ubuntu 22.04+)
   ansible.builtin.replace:
     path: "{{ unit_path | default('/etc/systemd/system/Splunkd.service') }}"
-    regexp: '\/sys\/fs\/cgroup\/\w+'
-    replace: '/sys/fs/cgroup'
+    regexp: '\/sys\/fs\/cgroup\/[\w,]+\/(?=system\.slice\/)'
+    replace: '/sys/fs/cgroup/'
   become: true
   register: splunk_unit_cgroup_fix
+  when:
+    - ansible_facts['distribution'] == "Ubuntu"
+    - ansible_facts['distribution_major_version'] | int >= 22
+
+# Earlier versions of the task above matched /sys/fs/cgroup/\w+ and so turned
+# an already-correct v2 path into /sys/fs/cgroup.slice/%n. Repair units it
+# left behind.
+- name: -systemd & Ubuntu- Repair a cgroups path mangled by an earlier fix
+  ansible.builtin.replace:
+    path: "{{ unit_path | default('/etc/systemd/system/Splunkd.service') }}"
+    regexp: '\/sys\/fs\/cgroup\.slice\/'
+    replace: '/sys/fs/cgroup/system.slice/'
+  become: true
+  register: splunk_unit_cgroup_repair
   when:
     - ansible_facts['distribution'] == "Ubuntu"
     - ansible_facts['distribution_major_version'] | int >= 22
@@ -34,4 +52,7 @@
   ansible.builtin.systemd_service:
     daemon_reload: true
   become: true
-  when: splunk_unit_init_scope_fix is changed or splunk_unit_cgroup_fix is changed
+  when: >-
+    splunk_unit_init_scope_fix is changed
+    or splunk_unit_cgroup_fix is changed
+    or splunk_unit_cgroup_repair is changed

@@ -7,6 +7,17 @@ to as 1.x for convenience.
 
 ## [Unreleased]
 
+### Fixed
+
+- On Ubuntu 22.04+, the unit-file fix that converts cgroup v1 paths to v2
+  also rewrote paths that were already v2 (as Splunk 10.6 generates them),
+  turning `/sys/fs/cgroup/system.slice/%n` into `/sys/fs/cgroup.slice/%n`.
+  The `ExecStartPost` chown then failed on every start - silently, as it is
+  `-` prefixed - and Splunk ran without owning its cgroup. The fix now only
+  strips a v1 controller directory, and units left mangled by the earlier
+  version are repaired on the next install, upgrade or UF run. Takes effect
+  at the next Splunk restart.
+
 ## [2.0.1] - 2026-08-18
 
 ### Added
